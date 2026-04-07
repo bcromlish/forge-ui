@@ -1,10 +1,8 @@
-export * from './AddBlockMenu';
-export * from './BlockConfigPanel';
-export * from './BlockContextMenu';
-export * from './BlockRenderer';
-export * from './ChildBlockWrapper';
-export * from './PageBuilderCanvas';
-export * from './PageBuilderChat';
-export * from './PageBuilderHeader';
-export * from './SlashCommandMenu';
-export * from './usePageHistory';
+// TODO: Page builder compositions are temporarily stubbed.
+// They depend on VidCruiter-specific types (PageBlock, BlockType, etc.)
+// and hooks. These need to be refactored before re-exporting.
+//
+// Stubbed components: AddBlockMenu, BlockConfigPanel, BlockContextMenu,
+//   BlockRenderer, ChildBlockWrapper, PageBuilderCanvas, PageBuilderChat,
+//   PageBuilderHeader, SlashCommandMenu, usePageHistory
+export {};

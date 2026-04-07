@@ -3,9 +3,9 @@
 import { cn } from "../../lib/utils";
 // TODO: Replace with prop-based API
 // import type { CalendarEvent } from "@/types/calendarEvents";
-import {
-  computeHorizontalEventPosition,
-  filterEventsByDay,
+// import {
+//   computeHorizontalEventPosition,
+//   filterEventsByDay,
 // TODO: Replace with prop-based API
 // } from "@/lib/domain/calendar-grid";
 import { CalendarEventBlock } from "./CalendarEventBlock";

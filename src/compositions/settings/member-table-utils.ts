@@ -5,8 +5,10 @@
  * @see components/settings/MembersTable.tsx
  * @see components/settings/MembersTableSkeleton.tsx
  */
-// TODO: Replace with prop-based API
-// import type { MembershipRole, MembershipStatus } from "@/features/organizations/types/memberships";
+// TODO: These types were originally imported from VidCruiter.
+// Inline stubs until a shared types package exists.
+export type MembershipRole = "admin" | "hiring_manager" | "interviewer" | "viewer";
+export type MembershipStatus = "active" | "pending_invite" | "suspended";
 
 /** Role badge color mapping -- distinct colors per role for visual scanning. */
 export const ROLE_COLORS: Record<MembershipRole, string> = {

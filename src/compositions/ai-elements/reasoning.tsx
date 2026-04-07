@@ -251,7 +251,7 @@ export const ReasoningContent = memo(
     const insideReasoning = useInsideReasoning();
 
     const content = (
-      <Streamdown plugins={streamdownPlugins} {...props}>
+      <Streamdown plugins={streamdownPlugins} {...props as Record<string, unknown>}>
         {children}
       </Streamdown>
     );

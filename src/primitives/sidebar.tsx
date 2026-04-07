@@ -5,9 +5,20 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { PanelLeftIcon } from "lucide-react"
 import { Slot } from "radix-ui"
 
-// TODO: Replace with prop-based API
-// import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "../lib/utils"
+
+/** Simple mobile detection hook (768px breakpoint). */
+function useIsMobile() {
+  const [isMobile, setIsMobile] = React.useState(false)
+  React.useEffect(() => {
+    const mql = window.matchMedia("(max-width: 767px)")
+    const onChange = () => setIsMobile(mql.matches)
+    onChange()
+    mql.addEventListener("change", onChange)
+    return () => mql.removeEventListener("change", onChange)
+  }, [])
+  return isMobile
+}
 import { Button } from "./button"
 import { Input } from "./input"
 import { Separator } from "./separator"

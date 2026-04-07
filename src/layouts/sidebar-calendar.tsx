@@ -23,9 +23,9 @@ import { TodayEvents } from "../compositions/calendar/TodayEvents";
 // import { useInterviewsByDateRange } from "@/features/interviews/hooks/useInterviews";
 // TODO: Replace with prop-based API
 // import { useMeetingsByDateRange } from "@/features/meetings/hooks";
-import {
-  normalizeInterviewToEvent,
-  normalizeMeetingToEvent,
+// import {
+//   normalizeInterviewToEvent,
+//   normalizeMeetingToEvent,
 // TODO: Replace with prop-based API
 // } from "@/lib/domain/calendar-events";
 // TODO: Replace with prop-based API

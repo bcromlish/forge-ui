@@ -4,10 +4,10 @@ import { Calendar, Clock, Users } from "lucide-react";
 import { cn } from "../../lib/utils";
 // TODO: Replace with prop-based API
 // import type { CalendarEvent } from "@/types/calendarEvents";
-import {
-  computeDayBoundaries,
-  filterEventsByDay,
-  sortEventsByTime,
+// import {
+//   computeDayBoundaries,
+//   filterEventsByDay,
+//   sortEventsByTime,
 // TODO: Replace with prop-based API
 // } from "@/lib/domain/calendar-grid";
 // TODO: Replace with prop-based API

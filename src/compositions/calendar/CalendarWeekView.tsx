@@ -6,11 +6,11 @@ import { cn } from "../../lib/utils";
 // import type { CalendarEvent } from "@/types/calendarEvents";
 // TODO: Replace with prop-based API
 // import type { DragSelection } from "@/hooks/useCalendarDrag";
-import {
-  generateTimeSlots,
-  computeDayBoundaries,
-  filterEventsByDay,
-  getWeekDays,
+// import {
+//   generateTimeSlots,
+//   computeDayBoundaries,
+//   filterEventsByDay,
+//   getWeekDays,
 // TODO: Replace with prop-based API
 // } from "@/lib/domain/calendar-grid";
 // TODO: Replace with prop-based API

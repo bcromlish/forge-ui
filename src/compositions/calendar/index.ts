@@ -1,24 +1,17 @@
-export * from './AgendaNotesSection';
-export * from './AttendeesSection';
-export * from './AvailabilityEventDetail';
-export * from './BufferBlock';
-export * from './CalendarDayView';
-export * from './CalendarEventBlock';
-export * from './CalendarEventDetail';
-export * from './CalendarEventFormSheet';
+// TODO: Calendar compositions are temporarily stubbed.
+// They depend on VidCruiter-specific hooks (useInterviewsByDateRange,
+// useMeetingsByDateRange, useActiveOrganization, etc.) and domain types
+// (CalendarEvent, CalendarViewMode, DragSelection).
+// These need to be refactored to accept data via props before re-exporting.
+//
+// Stubbed components: AgendaNotesSection, AttendeesSection, AvailabilityEventDetail,
+//   BufferBlock, CalendarDayView, CalendarEventBlock, CalendarEventDetail,
+//   CalendarEventFormSheet, CalendarMonthView, CalendarPageContent,
+//   CalendarQuickCreate, CalendarToolbar, CalendarWeekView, DayColumnWithDrag,
+//   DayRowWithDrag, InterviewEventDetail, MeetingEventDetail,
+//   QuickCreateInterviewForm, QuickCreateMeetingForm, RsvpWell,
+//   TeamMemberFilter, TodayEvents
+
+// Re-export only framework-independent helpers
 export * from './calendar-event-helpers';
 export * from './calendar-event-parts';
-export * from './CalendarMonthView';
-export * from './CalendarPageContent';
-export * from './CalendarQuickCreate';
-export * from './CalendarToolbar';
-export * from './CalendarWeekView';
-export * from './DayColumnWithDrag';
-export * from './DayRowWithDrag';
-export * from './InterviewEventDetail';
-export * from './MeetingEventDetail';
-export * from './QuickCreateInterviewForm';
-export * from './QuickCreateMeetingForm';
-export * from './RsvpWell';
-export * from './TeamMemberFilter';
-export * from './TodayEvents';

@@ -1,17 +1,14 @@
-export * from './AppHeader';
-export * from './AppSidebar';
-export * from './ConfirmDialog';
+// Universal layout components
 export * from './dashboard-layout';
 export * from './DetailPanel';
 export * from './list-page-layout';
-export * from './OrgSwitcher';
 export * from './segmented-toggle';
-export * from './SettingsSidebar';
-export * from './SidebarBack';
-export * from './sidebar-calendar';
-export * from './sidebar-chat';
-export * from './sidebar-footer';
-export * from './sidebar-tasks';
-export * from './sidebar-workspaces';
 export * from './workspace-icons';
-export * from './WorkspaceSelector';
+
+// TODO: The following layout components are temporarily excluded because they
+// depend on next/navigation, next-intl, and VidCruiter-specific hooks.
+// They need to be refactored to accept data via props before re-exporting.
+//
+// Excluded: AppHeader, AppSidebar, ConfirmDialog, OrgSwitcher,
+//   SettingsSidebar, SidebarBack, sidebar-calendar, sidebar-chat,
+//   sidebar-footer, sidebar-tasks, sidebar-workspaces, WorkspaceSelector

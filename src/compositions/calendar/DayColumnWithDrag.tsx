@@ -10,18 +10,18 @@
 import { cn } from "../../lib/utils";
 // TODO: Replace with prop-based API
 // import type { CalendarEvent } from "@/types/calendarEvents";
-import {
-  computeEventPosition,
-  detectOverlappingEvents,
+// import {
+//   computeEventPosition,
+//   detectOverlappingEvents,
 // TODO: Replace with prop-based API
 // } from "@/lib/domain/calendar-grid";
 // TODO: Replace with prop-based API
 // import { isToday } from "@/lib/domain/calendar-format";
 // TODO: Replace with prop-based API
 // import { formatDragTimeRange } from "@/lib/domain/calendar-drag";
-import {
-  useCalendarDrag,
-  type DragSelection,
+// import {
+//   useCalendarDrag,
+//   type DragSelection,
 // TODO: Replace with prop-based API
 // } from "@/hooks/useCalendarDrag";
 import { CalendarEventBlock } from "./CalendarEventBlock";

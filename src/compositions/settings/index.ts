@@ -1,14 +1,10 @@
-export * from './AuthMethodsList';
-export * from './DynamicFieldRenderer';
-export * from './EditMemberDialog';
-export * from './FieldDefinitionManager';
-export * from './FieldDefinitionRow';
-export * from './InviteMemberDialog';
-export * from './MembersTableSkeleton';
-export * from './MembersTable';
+// TODO: Settings compositions are temporarily stubbed.
+// They depend on next-intl, VidCruiter hooks, and Convex types.
+// These need to be refactored to accept data via props before re-exporting.
+//
+// Stubbed components: AuthMethodsList, DynamicFieldRenderer, EditMemberDialog,
+//   FieldDefinitionManager, FieldDefinitionRow, InviteMemberDialog,
+//   MembersTableSkeleton, MembersTable, ProfileAvatar, ProfileForm,
+//   RemoveMemberDialog, UserIdCard, WorkspaceAccessEditor
+
 export * from './member-table-utils';
-export * from './ProfileAvatar';
-export * from './ProfileForm';
-export * from './RemoveMemberDialog';
-export * from './UserIdCard';
-export * from './WorkspaceAccessEditor';

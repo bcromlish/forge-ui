@@ -18,10 +18,10 @@ import { SidebarFooterContent } from "./sidebar-footer";
 // import { useCurrentMembership } from "@/features/organizations/hooks/useCurrentMembership";
 // TODO: Replace with prop-based API
 // import type { WorkspaceId } from "@/features/organizations/types/workspaces";
-import {
-  getAccessibleWorkspaces,
-  workspaceForPath,
-  getDefaultRoute,
+// import {
+//   getAccessibleWorkspaces,
+//   workspaceForPath,
+//   getDefaultRoute,
 // TODO: Replace with prop-based API
 // } from "@/features/organizations/domain/workspaces";
 

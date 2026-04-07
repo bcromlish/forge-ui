@@ -13,10 +13,10 @@ import {
   CardHeader,
   CardTitle,
 } from "../../patterns/card";
-import {
-  useGenerateAvatarUploadUrl,
-  useUpdateAvatar,
-  useRemoveAvatar,
+// import {
+//   useGenerateAvatarUploadUrl,
+//   useUpdateAvatar,
+//   useRemoveAvatar,
 // TODO: Replace with prop-based API
 // } from "@/features/users/hooks-current";
 // TODO: Replace with prop-based API

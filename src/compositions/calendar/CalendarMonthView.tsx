@@ -3,10 +3,10 @@
 import { cn } from "../../lib/utils";
 // TODO: Replace with prop-based API
 // import type { CalendarEvent } from "@/types/calendarEvents";
-import {
-  getMonthGridDays,
-  computeDayBoundaries,
-  filterEventsByDay,
+// import {
+//   getMonthGridDays,
+//   computeDayBoundaries,
+//   filterEventsByDay,
 // TODO: Replace with prop-based API
 // } from "@/lib/domain/calendar-grid";
 // TODO: Replace with prop-based API
