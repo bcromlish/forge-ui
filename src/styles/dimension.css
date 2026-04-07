@@ -1,0 +1,56 @@
+/*
+ * Dimension System — Constrained spatial scale
+ *
+ * 17 named tokens (dim-0 through dim-16) governing all spatial values:
+ * padding, margin, gap, width, height, size, inset, and positioning.
+ * Developers use Tailwind classes with only allowed numeric values;
+ * these CSS custom properties provide named references for CSS-only
+ * contexts and future density scaling.
+ *
+ * Alternating x1.50 / x1.33 ratio from 4px through 384px.
+ *
+ * | Token    | px  | Tailwind | Intent                       |
+ * |----------|-----|----------|------------------------------|
+ * | --dim-0  |   0 | 0        | None                         |
+ * | --dim-1  |   1 | px       | Hairline borders             |
+ * | --dim-2  |   2 | 0.5      | Micro adjustments            |
+ * | --dim-3  |   4 | 1        | Tight: icon-label gaps       |
+ * | --dim-4  |   6 | 1.5      | Snug: compact controls       |
+ * | --dim-5  |   8 | 2        | Compact: input padding       |
+ * | --dim-6  |  12 | 3        | Standard: card padding       |
+ * | --dim-7  |  16 | 4        | Base: section padding        |
+ * | --dim-8  |  24 | 6        | Comfortable: section gaps    |
+ * | --dim-9  |  32 | 8        | Spacious: page-level         |
+ * | --dim-10 |  48 | 12       | Roomy: row heights           |
+ * | --dim-11 |  64 | 16       | Wide: max spacing            |
+ * | --dim-12 |  96 | 24       | Panel: skeleton rows         |
+ * | --dim-13 | 128 | 32       | Container: fixed rows        |
+ * | --dim-14 | 192 | 48       | Column: panel widths         |
+ * | --dim-15 | 256 | 64       | Sidebar: panel widths        |
+ * | --dim-16 | 384 | 96       | Canvas: full layout          |
+ *
+ * Allowed Tailwind values:
+ * 0, px, 0.5, 1, 1.5, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96
+ *
+ * @see docs/prds/dimension-system.md for design rationale
+ */
+
+@theme inline {
+  --dim-0: 0px;
+  --dim-1: 1px;
+  --dim-2: 0.125rem; /* 2px */
+  --dim-3: 0.25rem;  /* 4px */
+  --dim-4: 0.375rem; /* 6px */
+  --dim-5: 0.5rem;   /* 8px */
+  --dim-6: 0.75rem;  /* 12px */
+  --dim-7: 1rem;     /* 16px */
+  --dim-8: 1.5rem;   /* 24px */
+  --dim-9: 2rem;     /* 32px */
+  --dim-10: 3rem;    /* 48px */
+  --dim-11: 4rem;    /* 64px */
+  --dim-12: 6rem;    /* 96px */
+  --dim-13: 8rem;    /* 128px */
+  --dim-14: 12rem;   /* 192px */
+  --dim-15: 16rem;   /* 256px */
+  --dim-16: 24rem;   /* 384px */
+}

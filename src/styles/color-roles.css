@@ -1,0 +1,305 @@
+/**
+ * Primer-style color roles — domain-specific semantic tokens.
+ *
+ * 12 roles × 6 primitives (fg, fg-muted, bg, bg-emphasis, border, border-emphasis)
+ * = 72 tokens. Each role maps to a Tailwind palette for light and dark themes.
+ *
+ * Naming: --{role}-{primitive} → Tailwind class {property}-{role}-{primitive}
+ * Example: --success-fg → text-success-fg, --ai-bg → bg-ai-bg
+ *
+ * @see components/foundations/color-role-data.ts for Storybook documentation
+ */
+
+@theme inline {
+  /* success (emerald) */
+  --color-success-fg: var(--success-fg);
+  --color-success-fg-muted: var(--success-fg-muted);
+  --color-success-bg: var(--success-bg);
+  --color-success-bg-emphasis: var(--success-bg-emphasis);
+  --color-success-border: var(--success-border);
+  --color-success-border-emphasis: var(--success-border-emphasis);
+
+  /* warning (amber) */
+  --color-warning-fg: var(--warning-fg);
+  --color-warning-fg-muted: var(--warning-fg-muted);
+  --color-warning-bg: var(--warning-bg);
+  --color-warning-bg-emphasis: var(--warning-bg-emphasis);
+  --color-warning-border: var(--warning-border);
+  --color-warning-border-emphasis: var(--warning-border-emphasis);
+
+  /* destructive (red) — extends existing --destructive token */
+  --color-destructive-fg: var(--destructive-fg);
+  --color-destructive-fg-muted: var(--destructive-fg-muted);
+  --color-destructive-bg: var(--destructive-bg);
+  --color-destructive-bg-emphasis: var(--destructive-bg-emphasis);
+  --color-destructive-border: var(--destructive-border);
+  --color-destructive-border-emphasis: var(--destructive-border-emphasis);
+
+  /* ai (violet) */
+  --color-ai-fg: var(--ai-fg);
+  --color-ai-fg-muted: var(--ai-fg-muted);
+  --color-ai-bg: var(--ai-bg);
+  --color-ai-bg-emphasis: var(--ai-bg-emphasis);
+  --color-ai-border: var(--ai-border);
+  --color-ai-border-emphasis: var(--ai-border-emphasis);
+
+  /* templates (purple) */
+  --color-templates-fg: var(--templates-fg);
+  --color-templates-fg-muted: var(--templates-fg-muted);
+  --color-templates-bg: var(--templates-bg);
+  --color-templates-bg-emphasis: var(--templates-bg-emphasis);
+  --color-templates-border: var(--templates-border);
+  --color-templates-border-emphasis: var(--templates-border-emphasis);
+
+  /* automations (pink) */
+  --color-automations-fg: var(--automations-fg);
+  --color-automations-fg-muted: var(--automations-fg-muted);
+  --color-automations-bg: var(--automations-bg);
+  --color-automations-bg-emphasis: var(--automations-bg-emphasis);
+  --color-automations-border: var(--automations-border);
+  --color-automations-border-emphasis: var(--automations-border-emphasis);
+
+  /* applicants (indigo) */
+  --color-applicants-fg: var(--applicants-fg);
+  --color-applicants-fg-muted: var(--applicants-fg-muted);
+  --color-applicants-bg: var(--applicants-bg);
+  --color-applicants-bg-emphasis: var(--applicants-bg-emphasis);
+  --color-applicants-border: var(--applicants-border);
+  --color-applicants-border-emphasis: var(--applicants-border-emphasis);
+
+  /* ratings (yellow) */
+  --color-ratings-fg: var(--ratings-fg);
+  --color-ratings-fg-muted: var(--ratings-fg-muted);
+  --color-ratings-bg: var(--ratings-bg);
+  --color-ratings-bg-emphasis: var(--ratings-bg-emphasis);
+  --color-ratings-border: var(--ratings-border);
+  --color-ratings-border-emphasis: var(--ratings-border-emphasis);
+
+  /* references (blue) */
+  --color-references-fg: var(--references-fg);
+  --color-references-fg-muted: var(--references-fg-muted);
+  --color-references-bg: var(--references-bg);
+  --color-references-bg-emphasis: var(--references-bg-emphasis);
+  --color-references-border: var(--references-border);
+  --color-references-border-emphasis: var(--references-border-emphasis);
+
+  /* calendar (rose) */
+  --color-calendar-fg: var(--calendar-fg);
+  --color-calendar-fg-muted: var(--calendar-fg-muted);
+  --color-calendar-bg: var(--calendar-bg);
+  --color-calendar-bg-emphasis: var(--calendar-bg-emphasis);
+  --color-calendar-border: var(--calendar-border);
+  --color-calendar-border-emphasis: var(--calendar-border-emphasis);
+
+  /* files (stone) */
+  --color-files-fg: var(--files-fg);
+  --color-files-fg-muted: var(--files-fg-muted);
+  --color-files-bg: var(--files-bg);
+  --color-files-bg-emphasis: var(--files-bg-emphasis);
+  --color-files-border: var(--files-border);
+  --color-files-border-emphasis: var(--files-border-emphasis);
+
+  /* accent (sky) — distinct from shadcn --accent (hover states) */
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-fg-muted: var(--accent-fg-muted);
+  --color-accent-bg: var(--accent-bg);
+  --color-accent-bg-emphasis: var(--accent-bg-emphasis);
+  --color-accent-border: var(--accent-border);
+  --color-accent-border-emphasis: var(--accent-border-emphasis);
+}
+
+:root {
+  /* success — emerald */
+  --success-fg: var(--color-emerald-800);
+  --success-fg-muted: var(--color-emerald-500);
+  --success-bg: var(--color-emerald-50);
+  --success-bg-emphasis: var(--color-emerald-700);
+  --success-border: var(--color-emerald-200);
+  --success-border-emphasis: var(--color-emerald-500);
+
+  /* warning — amber */
+  --warning-fg: var(--color-amber-800);
+  --warning-fg-muted: var(--color-amber-500);
+  --warning-bg: var(--color-amber-50);
+  --warning-bg-emphasis: var(--color-amber-700);
+  --warning-border: var(--color-amber-200);
+  --warning-border-emphasis: var(--color-amber-500);
+
+  /* destructive — red */
+  --destructive-fg: var(--color-red-800);
+  --destructive-fg-muted: var(--color-red-500);
+  --destructive-bg: var(--color-red-50);
+  --destructive-bg-emphasis: var(--color-red-700);
+  --destructive-border: var(--color-red-200);
+  --destructive-border-emphasis: var(--color-red-500);
+
+  /* ai — violet */
+  --ai-fg: var(--color-violet-800);
+  --ai-fg-muted: var(--color-violet-500);
+  --ai-bg: var(--color-violet-50);
+  --ai-bg-emphasis: var(--color-violet-700);
+  --ai-border: var(--color-violet-200);
+  --ai-border-emphasis: var(--color-violet-500);
+
+  /* templates — purple */
+  --templates-fg: var(--color-purple-800);
+  --templates-fg-muted: var(--color-purple-500);
+  --templates-bg: var(--color-purple-50);
+  --templates-bg-emphasis: var(--color-purple-700);
+  --templates-border: var(--color-purple-200);
+  --templates-border-emphasis: var(--color-purple-500);
+
+  /* automations — pink */
+  --automations-fg: var(--color-pink-800);
+  --automations-fg-muted: var(--color-pink-500);
+  --automations-bg: var(--color-pink-50);
+  --automations-bg-emphasis: var(--color-pink-700);
+  --automations-border: var(--color-pink-200);
+  --automations-border-emphasis: var(--color-pink-500);
+
+  /* applicants — indigo */
+  --applicants-fg: var(--color-indigo-800);
+  --applicants-fg-muted: var(--color-indigo-500);
+  --applicants-bg: var(--color-indigo-50);
+  --applicants-bg-emphasis: var(--color-indigo-700);
+  --applicants-border: var(--color-indigo-200);
+  --applicants-border-emphasis: var(--color-indigo-500);
+
+  /* ratings — yellow */
+  --ratings-fg: var(--color-yellow-800);
+  --ratings-fg-muted: var(--color-yellow-500);
+  --ratings-bg: var(--color-yellow-50);
+  --ratings-bg-emphasis: var(--color-yellow-700);
+  --ratings-border: var(--color-yellow-200);
+  --ratings-border-emphasis: var(--color-yellow-500);
+
+  /* references — blue */
+  --references-fg: var(--color-blue-800);
+  --references-fg-muted: var(--color-blue-500);
+  --references-bg: var(--color-blue-50);
+  --references-bg-emphasis: var(--color-blue-700);
+  --references-border: var(--color-blue-200);
+  --references-border-emphasis: var(--color-blue-500);
+
+  /* calendar — rose */
+  --calendar-fg: var(--color-rose-800);
+  --calendar-fg-muted: var(--color-rose-500);
+  --calendar-bg: var(--color-rose-50);
+  --calendar-bg-emphasis: var(--color-rose-700);
+  --calendar-border: var(--color-rose-200);
+  --calendar-border-emphasis: var(--color-rose-500);
+
+  /* files — stone */
+  --files-fg: var(--color-stone-800);
+  --files-fg-muted: var(--color-stone-500);
+  --files-bg: var(--color-stone-50);
+  --files-bg-emphasis: var(--color-stone-700);
+  --files-border: var(--color-stone-200);
+  --files-border-emphasis: var(--color-stone-500);
+
+  /* accent — sky */
+  --accent-fg: var(--color-sky-800);
+  --accent-fg-muted: var(--color-sky-500);
+  --accent-bg: var(--color-sky-50);
+  --accent-bg-emphasis: var(--color-sky-700);
+  --accent-border: var(--color-sky-200);
+  --accent-border-emphasis: var(--color-sky-500);
+}
+
+.dark {
+  /* success — emerald */
+  --success-fg: var(--color-emerald-300);
+  --success-fg-muted: var(--color-emerald-400);
+  --success-bg: var(--color-emerald-950);
+  --success-bg-emphasis: var(--color-emerald-500);
+  --success-border: var(--color-emerald-800);
+  --success-border-emphasis: var(--color-emerald-400);
+
+  /* warning — amber */
+  --warning-fg: var(--color-amber-300);
+  --warning-fg-muted: var(--color-amber-400);
+  --warning-bg: var(--color-amber-950);
+  --warning-bg-emphasis: var(--color-amber-500);
+  --warning-border: var(--color-amber-800);
+  --warning-border-emphasis: var(--color-amber-400);
+
+  /* destructive — red */
+  --destructive-fg: var(--color-red-300);
+  --destructive-fg-muted: var(--color-red-400);
+  --destructive-bg: var(--color-red-950);
+  --destructive-bg-emphasis: var(--color-red-500);
+  --destructive-border: var(--color-red-800);
+  --destructive-border-emphasis: var(--color-red-400);
+
+  /* ai — violet */
+  --ai-fg: var(--color-violet-300);
+  --ai-fg-muted: var(--color-violet-400);
+  --ai-bg: var(--color-violet-950);
+  --ai-bg-emphasis: var(--color-violet-500);
+  --ai-border: var(--color-violet-800);
+  --ai-border-emphasis: var(--color-violet-400);
+
+  /* templates — purple */
+  --templates-fg: var(--color-purple-300);
+  --templates-fg-muted: var(--color-purple-400);
+  --templates-bg: var(--color-purple-950);
+  --templates-bg-emphasis: var(--color-purple-500);
+  --templates-border: var(--color-purple-800);
+  --templates-border-emphasis: var(--color-purple-400);
+
+  /* automations — pink */
+  --automations-fg: var(--color-pink-300);
+  --automations-fg-muted: var(--color-pink-400);
+  --automations-bg: var(--color-pink-950);
+  --automations-bg-emphasis: var(--color-pink-500);
+  --automations-border: var(--color-pink-800);
+  --automations-border-emphasis: var(--color-pink-400);
+
+  /* applicants — indigo */
+  --applicants-fg: var(--color-indigo-300);
+  --applicants-fg-muted: var(--color-indigo-400);
+  --applicants-bg: var(--color-indigo-950);
+  --applicants-bg-emphasis: var(--color-indigo-500);
+  --applicants-border: var(--color-indigo-800);
+  --applicants-border-emphasis: var(--color-indigo-400);
+
+  /* ratings — yellow */
+  --ratings-fg: var(--color-yellow-300);
+  --ratings-fg-muted: var(--color-yellow-400);
+  --ratings-bg: var(--color-yellow-950);
+  --ratings-bg-emphasis: var(--color-yellow-500);
+  --ratings-border: var(--color-yellow-800);
+  --ratings-border-emphasis: var(--color-yellow-400);
+
+  /* references — blue */
+  --references-fg: var(--color-blue-300);
+  --references-fg-muted: var(--color-blue-400);
+  --references-bg: var(--color-blue-950);
+  --references-bg-emphasis: var(--color-blue-500);
+  --references-border: var(--color-blue-800);
+  --references-border-emphasis: var(--color-blue-400);
+
+  /* calendar — rose */
+  --calendar-fg: var(--color-rose-300);
+  --calendar-fg-muted: var(--color-rose-400);
+  --calendar-bg: var(--color-rose-950);
+  --calendar-bg-emphasis: var(--color-rose-500);
+  --calendar-border: var(--color-rose-800);
+  --calendar-border-emphasis: var(--color-rose-400);
+
+  /* files — stone */
+  --files-fg: var(--color-stone-300);
+  --files-fg-muted: var(--color-stone-400);
+  --files-bg: var(--color-stone-950);
+  --files-bg-emphasis: var(--color-stone-500);
+  --files-border: var(--color-stone-800);
+  --files-border-emphasis: var(--color-stone-400);
+
+  /* accent — sky */
+  --accent-fg: var(--color-sky-300);
+  --accent-fg-muted: var(--color-sky-400);
+  --accent-bg: var(--color-sky-950);
+  --accent-bg-emphasis: var(--color-sky-500);
+  --accent-border: var(--color-sky-800);
+  --accent-border-emphasis: var(--color-sky-400);
+}

@@ -1,0 +1,99 @@
+/*
+ * Content Blocks — Foundational text compositions
+ *
+ * 10 named block utilities that codify recurring heading + subtext pairings.
+ * Each sets only display, flex-direction, and gap — type classes remain on
+ * child elements for full composability.
+ *
+ * Tier 1 (Marketing): hero, showcase, feature
+ * Tier 2 (Page/Section): page-header, section, intro
+ * Tier 3 (Card/Compact): blurb, list-item, field, stat
+ *
+ * Plus `block-center` modifier for centered alignment.
+ *
+ * @see app/styles/typography.css for the type scale these compose
+ * @see app/styles/dimension.css for --dim-* gap tokens
+ */
+
+/* ==========================================================================
+   Tier 1 — Marketing / Hero Scale
+   ========================================================================== */
+
+@utility block-hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dim-7); /* 16px */
+}
+
+@utility block-showcase {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dim-6); /* 12px */
+}
+
+@utility block-feature {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dim-5); /* 8px */
+}
+
+/* ==========================================================================
+   Tier 2 — Page / Section Scale
+   ========================================================================== */
+
+@utility block-page-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dim-3); /* 4px */
+}
+
+@utility block-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dim-3); /* 4px */
+}
+
+/** Intro uses 8px gap between heading group and body.
+ *  The 4px overline→heading gap is handled by nesting. */
+@utility block-intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dim-5); /* 8px */
+}
+
+/* ==========================================================================
+   Tier 3 — Card / Compact Scale
+   ========================================================================== */
+
+@utility block-blurb {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dim-2); /* 2px */
+}
+
+@utility block-list-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dim-0); /* 0px */
+}
+
+@utility block-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dim-2); /* 2px */
+}
+
+@utility block-stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dim-2); /* 2px */
+}
+
+/* ==========================================================================
+   Modifier — Center alignment
+   ========================================================================== */
+
+@utility block-center {
+  align-items: center;
+  text-align: center;
+}

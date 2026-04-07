@@ -1,0 +1,45 @@
+/*
+ * Breakpoint System — Responsive layout thresholds
+ *
+ * 8 named breakpoints adapted from eBay Playbook, overriding Tailwind 4
+ * defaults. Mobile-first (min-width) as Tailwind convention. Each token
+ * is registered as a Tailwind `--breakpoint-*` theme value, so standard
+ * responsive prefixes (sm:, md:, lg:, etc.) use these widths.
+ *
+ * The scale targets real device classes, not abstract sizes:
+ *
+ * | Token  | px   | Tailwind | Target                          |
+ * |--------|------|----------|---------------------------------|
+ * | xs     |  320 | xs:      | Small phones (iPhone SE)        |
+ * | sm     |  512 | sm:      | Large phones / small tablets    |
+ * | md     |  768 | md:      | Tablets (iPad Mini portrait)    |
+ * | lg     | 1024 | lg:      | Small laptops / tablets landscape |
+ * | xl     | 1280 | xl:      | Standard laptops                |
+ * | 2xl    | 1440 | 2xl:     | Large laptops / small desktops  |
+ * | 3xl    | 1680 | 3xl:     | Desktop monitors                |
+ * | 4xl    | 1920 | 4xl:     | Large / ultra-wide displays     |
+ *
+ * Design guidance:
+ * - xs-sm: single-column, stacked layouts, hamburger nav
+ * - md-lg: two-column layouts, sidebar appears, expanded nav
+ * - xl-2xl: full three-column layouts, data-dense tables
+ * - 3xl-4xl: ultra-wide optimizations, max-width containers
+ *
+ * Inspired by eBay Playbook responsive grid, adapted for ATS dashboard UX
+ * where data-dense views (candidate tables, pipeline boards) benefit from
+ * granular breakpoints above the typical 1280px ceiling.
+ *
+ * @see app/styles/dimension.css for the spatial scale these pair with
+ * @see app/styles/typography.css for responsive type scaling
+ */
+
+@theme inline {
+  --breakpoint-xs: 320px;
+  --breakpoint-sm: 512px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1440px;
+  --breakpoint-3xl: 1680px;
+  --breakpoint-4xl: 1920px;
+}

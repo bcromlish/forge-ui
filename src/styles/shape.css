@@ -1,0 +1,80 @@
+/*
+ * Shape System — Radius + Border Width Tokens
+ *
+ * Three layers:
+ *
+ * 1. Tailwind radius primitives (--radius-*) — reference --dim-* tokens
+ *    directly so corners use the same spatial scale as padding/gaps.
+ * 2. Semantic shape aliases (--shape-*) — purpose-named tokens that
+ *    answer "what am I styling?" instead of "how big?"
+ * 3. Border width tokens (--border-*) — stroke thickness scale.
+ *
+ * Inspired by eBay Playbook where radius.formInput = dimension.core.100.
+ *
+ * Layer 1 — Tailwind radius primitives:
+ * | Token         | Dim Ref  | px  | Tailwind     |
+ * |---------------|----------|-----|--------------|
+ * | --radius-sm   | --dim-3  |   4 | rounded-sm   |
+ * | --radius-md   | --dim-5  |   8 | rounded-md   |
+ * | --radius-lg   | --dim-6  |  12 | rounded-lg   |
+ * | --radius-xl   | --dim-7  |  16 | rounded-xl   |
+ * | --radius-2xl  | --dim-8  |  24 | rounded-2xl  |
+ *
+ * Layer 2 — Semantic shape aliases:
+ * | Token                  | Radius Ref  | Elements                    |
+ * |------------------------|-------------|-----------------------------|
+ * | --shape-form-input     | --radius-md | Inputs, selects, textareas  |
+ * | --shape-card           | --radius-lg | Cards, sheets, toasts       |
+ * | --shape-popover        | --radius-lg | Dialogs, modals, popovers   |
+ * | --shape-photo-sm       | --radius-md | Thumbnails, small images    |
+ * | --shape-photo-lg       | --radius-xl | Hero images, large photos   |
+ * | --shape-pill           | 9999px      | Badges, avatars, tags       |
+ *
+ * Layer 3 — Border widths:
+ * | Token           | Value | Tailwind | Elements                    |
+ * |-----------------|-------|----------|-----------------------------|
+ * | --border-thin   | 0.5px | custom   | Hairline separators (HiDPI) |
+ * | --border-medium | 1px   | border   | All structural borders      |
+ * | --border-thick  | 2px   | border-2 | Active indicators, emphasis  |
+ *
+ * Allowed rounded classes: none, sm, md, lg, xl, 2xl, full
+ * Allowed border-width classes: border-0, border, border-2
+ *
+ * @see app/styles/dimension.css for the --dim-* tokens these reference
+ * @see docs/prds/shape-system.md for design rationale
+ */
+
+/* ==========================================================================
+   Layer 1: Radius Primitives — Tailwind theme tokens via dimension scale
+   ========================================================================== */
+
+@theme inline {
+  --radius-sm: var(--dim-3);    /* 4px */
+  --radius-md: var(--dim-5);    /* 8px */
+  --radius-lg: var(--dim-6);    /* 12px */
+  --radius-xl: var(--dim-7);    /* 16px */
+  --radius-2xl: var(--dim-8);   /* 24px */
+}
+
+/* ==========================================================================
+   Layer 2: Semantic Shape Aliases — purpose-named tokens
+   ========================================================================== */
+
+:root {
+  --shape-form-input: var(--radius-md);    /* 8px — inputs, selects, textareas */
+  --shape-card: var(--radius-lg);          /* 12px — cards, sheets, toasts */
+  --shape-popover: var(--radius-lg);       /* 12px — dialogs, modals, popovers */
+  --shape-photo-sm: var(--radius-md);      /* 8px — thumbnails, small images */
+  --shape-photo-lg: var(--radius-xl);      /* 16px — hero images, large photos */
+  --shape-pill: 9999px;                    /* full — badges, avatars, tags */
+}
+
+/* ==========================================================================
+   Layer 3: Border Width Tokens — stroke thickness scale
+   ========================================================================== */
+
+:root {
+  --border-thin: 0.5px;
+  --border-medium: 1px;
+  --border-thick: 2px;
+}

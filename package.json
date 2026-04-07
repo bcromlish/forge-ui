@@ -1,0 +1,114 @@
+{
+  "name": "@anthropic-forge/ui",
+  "version": "0.1.0",
+  "description": "Design system and component library for Forge projects",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": ["dist", "src/styles"],
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./styles/*": "./src/styles/*",
+    "./primitives": {
+      "import": "./dist/primitives.mjs",
+      "require": "./dist/primitives.js",
+      "types": "./dist/primitives.d.ts"
+    },
+    "./patterns": {
+      "import": "./dist/patterns.mjs",
+      "require": "./dist/patterns.js",
+      "types": "./dist/patterns.d.ts"
+    },
+    "./layouts": {
+      "import": "./dist/layouts.mjs",
+      "require": "./dist/layouts.js",
+      "types": "./dist/layouts.d.ts"
+    },
+    "./compositions/ai": {
+      "import": "./dist/compositions-ai.mjs",
+      "require": "./dist/compositions-ai.js",
+      "types": "./dist/compositions-ai.d.ts"
+    },
+    "./compositions/calendar": {
+      "import": "./dist/compositions-calendar.mjs",
+      "require": "./dist/compositions-calendar.js",
+      "types": "./dist/compositions-calendar.d.ts"
+    },
+    "./compositions/settings": {
+      "import": "./dist/compositions-settings.mjs",
+      "require": "./dist/compositions-settings.js",
+      "types": "./dist/compositions-settings.d.ts"
+    },
+    "./compositions/page-builder": {
+      "import": "./dist/compositions-page-builder.mjs",
+      "require": "./dist/compositions-page-builder.js",
+      "types": "./dist/compositions-page-builder.d.ts"
+    },
+    "./compositions/analytics": {
+      "import": "./dist/compositions-analytics.mjs",
+      "require": "./dist/compositions-analytics.js",
+      "types": "./dist/compositions-analytics.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint src/",
+    "typecheck": "tsc --noEmit",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "dependencies": {
+    "@base-ui/react": "^1.2.0",
+    "@hookform/resolvers": "^5.2.2",
+    "@radix-ui/react-use-controllable-state": "^1.2.2",
+    "@tiptap/core": "^3.20.5",
+    "@tiptap/extension-character-count": "^3.20.5",
+    "@tiptap/extension-image": "^3.20.5",
+    "@tiptap/extension-link": "^3.20.5",
+    "@tiptap/extension-placeholder": "^3.20.5",
+    "@tiptap/extension-underline": "^3.20.5",
+    "@tiptap/html": "^3.20.4",
+    "@tiptap/pm": "^3.20.4",
+    "@tiptap/react": "^3.20.5",
+    "@tiptap/starter-kit": "^3.20.5",
+    "@tiptap/suggestion": "^3.20.5",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
+    "date-fns": "^4.1.0",
+    "embla-carousel-react": "^8.6.0",
+    "input-otp": "^1.4.2",
+    "lucide-react": "^0.574.0",
+    "motion": "^12.34.3",
+    "next-themes": "^0.4.6",
+    "radix-ui": "^1.4.3",
+    "react-day-picker": "^9.13.2",
+    "react-hook-form": "^7.71.1",
+    "react-resizable-panels": "^4.6.4",
+    "recharts": "^2.15.4",
+    "shiki": "^3.23.0",
+    "sonner": "^2.0.7",
+    "tailwind-merge": "^3.4.1",
+    "tw-animate-css": "^1.4.0",
+    "vaul": "^1.1.2",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.2.1",
+    "@types/react": "^19.2.13",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^9.39.2",
+    "tailwindcss": "^4.2.1",
+    "tsup": "^8.4.0",
+    "typescript": "^5.9.3"
+  }
+}
