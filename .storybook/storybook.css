@@ -1,0 +1,10 @@
+@import "tailwindcss";
+@import "../src/styles/colors.css";
+@import "../src/styles/colors-faded.css";
+@import "../src/styles/colors-washed.css";
+@import "../src/styles/color-roles.css";
+@import "../src/styles/breakpoint.css";
+@import "../src/styles/dimension.css";
+@import "../src/styles/shape.css";
+@import "../src/styles/typography.css";
+@import "../src/styles/content-blocks.css";

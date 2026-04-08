@@ -97,6 +97,7 @@
     "src/layouts/sidebar-footer.tsx",
     "src/layouts/sidebar-tasks.tsx",
     "src/layouts/sidebar-workspaces.tsx",
-    "src/layouts/WorkspaceSelector.tsx"
+    "src/layouts/WorkspaceSelector.tsx",
+    "src/**/*.stories.tsx"
   ]
 }
