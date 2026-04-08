@@ -1,4 +1,5 @@
-// TODO: Replace with prop-based API
-// /** @deprecated Use @/features/forms/components/blocks/SelectSingleBlockRenderer instead. */
-// TODO: Replace with prop-based API
-// export { SelectSingleBlockRenderer } from "@/features/forms/components/blocks/SelectSingleBlockRenderer";
+/**
+ * Placeholder — the original VidCruiter re-export has been removed.
+ * Consumers should provide their own implementation.
+ */
+export {};

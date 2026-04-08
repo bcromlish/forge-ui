@@ -1,7 +1,7 @@
 /**
- * DEPRECATED -- Re-exports from features/forms/components for backward compat.
-// TODO: Replace with prop-based API
-//  * @deprecated Use `@/features/forms/components/BlockRenderer` instead.
+ * Placeholder for BlockRenderer composition.
+ * The original VidCruiter re-export has been removed.
+ * Consumers should provide their own BlockRenderer implementation
+ * or import from their application's form builder feature.
  */
-// TODO: Replace with prop-based API
-// export { BlockRenderer } from "@/features/forms/components/BlockRenderer";
+export {};

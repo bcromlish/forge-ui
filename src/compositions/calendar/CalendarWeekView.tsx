@@ -2,22 +2,16 @@
 
 import { useEffect, useRef } from "react";
 import { cn } from "../../lib/utils";
-// TODO: Replace with prop-based API
-// import type { CalendarEvent } from "@/types/calendarEvents";
-// TODO: Replace with prop-based API
-// import type { DragSelection } from "@/hooks/useCalendarDrag";
-// import {
-//   generateTimeSlots,
-//   computeDayBoundaries,
-//   filterEventsByDay,
-//   getWeekDays,
-// TODO: Replace with prop-based API
-// } from "@/lib/domain/calendar-grid";
-// TODO: Replace with prop-based API
-// import { isToday } from "@/lib/domain/calendar-format";
+import type { CalendarEvent, DragSelection } from "../../types/calendar";
+import {
+  generateTimeSlots,
+  computeDayBoundaries,
+  filterEventsByDay,
+  getWeekDays,
+  isToday,
+} from "../../types/calendar-utils";
 import { DayColumnWithDrag } from "./DayColumnWithDrag";
 
-/** Default grid parameters. */
 const DEFAULT_START_HOUR = 0;
 const DEFAULT_END_HOUR = 24;
 const PIXELS_PER_HOUR = 60;
@@ -33,11 +27,9 @@ interface CalendarWeekViewProps {
   onTimeSlotClick?: (date: Date, hour: number) => void;
   onDragComplete?: (selection: DragSelection) => void;
   highlightedUserIds?: string[];
-  /** User lookup for avatar rendering in event blocks. */
   userMap?: Map<string, { _id: string; name: string; avatarUrl?: string }>;
 }
 
-/** Day column header. */
 function DayHeader({ date, eventCount }: { date: Date; eventCount: number }) {
   const today = isToday(date);
   const dayLabel = date.toLocaleDateString("en-US", { weekday: "short" });
@@ -68,10 +60,6 @@ function DayHeader({ date, eventCount }: { date: Date; eventCount: number }) {
   );
 }
 
-/**
- * Week view — CSS Grid time grid showing 7 days with hourly time slots
- * and positioned events. The core calendar component.
- */
 export function CalendarWeekView({
   events,
   weekStart,
@@ -87,7 +75,6 @@ export function CalendarWeekView({
   const totalHours = endHour - startHour;
   const gridHeight = totalHours * PIXELS_PER_HOUR;
 
-  // Scroll to 6 AM on mount so the working day is visible by default
   useEffect(() => {
     if (scrollRef.current) {
       const defaultVisibleHour = 6;
@@ -98,12 +85,11 @@ export function CalendarWeekView({
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden rounded-lg border bg-white dark:bg-gray-950">
-      {/* Day headers */}
       <div
         className="grid border-b"
         style={{ gridTemplateColumns: "60px repeat(7, 1fr)" }}
       >
-        <div className="border-r" /> {/* gutter spacer */}
+        <div className="border-r" />
         {days.map((day, i) => {
           const { start, end } = computeDayBoundaries(day);
           const dayEvents = filterEventsByDay(events, start, end).filter(
@@ -117,7 +103,6 @@ export function CalendarWeekView({
         })}
       </div>
 
-      {/* Scrollable time grid */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto">
         <div
           className="grid relative"
@@ -126,7 +111,6 @@ export function CalendarWeekView({
             height: gridHeight,
           }}
         >
-          {/* Time gutter */}
           <div className="border-r relative">
             {timeSlots
               .filter((_, i) => i % (60 / SLOT_INTERVAL) === 0)
@@ -144,7 +128,6 @@ export function CalendarWeekView({
               })}
           </div>
 
-          {/* Day columns */}
           {days.map((day, dayIdx) => {
             const { start: dayStart, end: dayEnd } = computeDayBoundaries(day);
             const dayEvents = filterEventsByDay(events, dayStart, dayEnd);
@@ -175,7 +158,6 @@ export function CalendarWeekView({
   );
 }
 
-/** Red line showing current time. */
 function CurrentTimeIndicator({
   startHour,
   pixelsPerHour,
@@ -186,9 +168,7 @@ function CurrentTimeIndicator({
   const now = new Date();
   const hours = now.getHours() + now.getMinutes() / 60;
   const top = (hours - startHour) * pixelsPerHour;
-
   if (top < 0) return null;
-
   return (
     <div className="absolute left-0 right-0 z-[3] pointer-events-none" style={{ top }}>
       <div className="flex items-center">

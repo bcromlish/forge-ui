@@ -1,35 +1,43 @@
+/**
+ * Interactive pipeline showcase.
+ * All data and actions provided via props -- no internal fixtures or reducers.
+ */
 "use client";
 
-import { useReducer } from "react";
-// TODO: Replace with prop-based API
-// import { FIXTURE_POSITIONS } from "@/lib/fixtures";
-// TODO: Replace with prop-based API
-// import { pipelineReducer } from "@/lib/fixtures/reducers";
-// TODO: Replace with prop-based API
-// import { PositionCard } from "@/features/positions/components/PositionCard";
 import { ListPageLayout } from "../../layouts/list-page-layout";
 import { EmptyState } from "../../patterns/empty-state";
 import { StatusBadge } from "../../patterns/status-badge";
 import { Briefcase } from "lucide-react";
-// TODO: Replace with prop-based API
-// import type { PositionStatus } from "@/types/domain";
 
-/**
- * Interactive pipeline showcase using fixture data + useReducer.
- * Demonstrates the full hiring pipeline UI without any Convex dependency.
- * Same components as the live app — different data source.
- */
-export function PipelineShowcase() {
-  const [positions, dispatch] = useReducer(pipelineReducer, FIXTURE_POSITIONS);
+/** A position entry for the pipeline showcase. */
+export interface ShowcasePosition {
+  _id: string;
+  title: string;
+  status: string;
+  [key: string]: unknown;
+}
 
-  function handleStatusChange(positionId: string, status: PositionStatus) {
-    dispatch({ type: "CHANGE_STATUS", positionId, status });
-  }
+/** Props for {@link PipelineShowcase}. */
+interface PipelineShowcaseProps {
+  /** Positions to display. */
+  positions: ShowcasePosition[];
+  /** Called when a position's status changes. */
+  onStatusChange?: (positionId: string, status: string) => void;
+  /** Called when a position is deleted. */
+  onDelete?: (positionId: string) => void;
+  /** Render function for a single position card. */
+  renderPositionCard?: (
+    position: ShowcasePosition,
+    handlers: { onStatusChange?: (positionId: string, status: string) => void; onDelete?: (positionId: string) => void }
+  ) => React.ReactNode;
+}
 
-  function handleDelete(positionId: string) {
-    dispatch({ type: "DELETE_POSITION", positionId });
-  }
-
+export function PipelineShowcase({
+  positions,
+  onStatusChange,
+  onDelete,
+  renderPositionCard,
+}: PipelineShowcaseProps) {
   const statusCounts = positions.reduce<Record<string, number>>((acc, p) => {
     acc[p.status] = (acc[p.status] ?? 0) + 1;
     return acc;
@@ -42,7 +50,7 @@ export function PipelineShowcase() {
         <div className="flex gap-2">
           {Object.entries(statusCounts).map(([status, count]) => (
             <div key={status} className="flex items-center gap-1">
-              <StatusBadge status={status as PositionStatus} />
+              <StatusBadge status={status} />
               <span className="text-caption text-muted-foreground">{count}</span>
             </div>
           ))}
@@ -56,14 +64,18 @@ export function PipelineShowcase() {
           description="Refresh the page to reset the demo data."
         />
       ) : (
-        positions.map((position) => (
-          <PositionCard
-            key={position._id}
-            position={position}
-            onStatusChange={handleStatusChange}
-            onDelete={handleDelete}
-          />
-        ))
+        positions.map((position) =>
+          renderPositionCard ? (
+            <div key={position._id}>
+              {renderPositionCard(position, { onStatusChange, onDelete })}
+            </div>
+          ) : (
+            <div key={position._id} className="rounded-lg border p-4">
+              <p className="text-body font-medium">{position.title}</p>
+              <StatusBadge status={position.status} />
+            </div>
+          )
+        )
       )}
     </ListPageLayout>
   );

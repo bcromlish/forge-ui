@@ -1,7 +1,7 @@
 /**
- * DEPRECATED -- Re-exports from features/forms/components for backward compat.
-// TODO: Replace with prop-based API
-//  * @deprecated Use `@/features/forms/components/AddBlockMenu` instead.
+ * Placeholder for AddBlockMenu composition.
+ * The original VidCruiter re-export has been removed.
+ * Consumers should provide their own AddBlockMenu implementation
+ * or import from their application's form builder feature.
  */
-// TODO: Replace with prop-based API
-// export { AddBlockMenu } from "@/features/forms/components/AddBlockMenu";
+export {};

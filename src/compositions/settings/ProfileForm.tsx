@@ -1,87 +1,55 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useTranslations } from "next-intl";
-import { toast } from "sonner";
 import { Button } from "../../primitives/button";
 import { Input } from "../../primitives/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "../../patterns/card";
-// TODO: Replace with prop-based API
-// import { useUpdateProfile } from "@/features/users/hooks-current";
-// TODO: Replace with prop-based API
-// import { MAX_NAME_LENGTH } from "@/features/users/domain";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../patterns/card";
 
-/** Props for {@link ProfileForm}. */
+const DEFAULT_MAX_NAME_LENGTH = 64;
+
 interface ProfileFormProps {
-  /** Current user display name. */
   currentName: string;
+  /** Save handler -- receives the new name. */
+  onSave: (name: string) => Promise<void>;
+  /** Maximum name length. Defaults to 64. */
+  maxNameLength?: number;
+  /** Labels for i18n. */
+  labels?: {
+    title?: string; description?: string; placeholder?: string; maxLength?: string;
+    save?: string; saving?: string;
+  };
 }
 
-/**
- * Editable display name form with save button.
- * Validates 1-64 character limit and shows toast on success/failure.
- */
-export function ProfileForm({ currentName }: ProfileFormProps) {
+export function ProfileForm({
+  currentName, onSave, maxNameLength = DEFAULT_MAX_NAME_LENGTH, labels = {},
+}: ProfileFormProps) {
   const [name, setName] = useState(currentName);
   const [isSaving, setIsSaving] = useState(false);
-  const updateProfile = useUpdateProfile();
-  const t = useTranslations("settings.profile.displayName");
-  const tCommon = useTranslations("common");
 
   const isDirty = name.trim() !== currentName;
-  const isValid = name.trim().length >= 1 && name.trim().length <= MAX_NAME_LENGTH;
+  const isValid = name.trim().length >= 1 && name.trim().length <= maxNameLength;
 
   const handleSave = useCallback(async () => {
     if (!isDirty || !isValid) return;
-
     setIsSaving(true);
-    try {
-      await updateProfile({ name: name.trim() });
-      toast.success(t("success"));
-    } catch (err) {
-      const message = err instanceof Error ? err.message : t("error");
-      toast.error(message);
-    } finally {
-      setIsSaving(false);
-    }
-  }, [name, isDirty, isValid, updateProfile, t]);
+    try { await onSave(name.trim()); } finally { setIsSaving(false); }
+  }, [name, isDirty, isValid, onSave]);
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t("title")}</CardTitle>
-        <CardDescription>
-          {t("description")}
-        </CardDescription>
+        <CardTitle>{labels.title ?? "Display Name"}</CardTitle>
+        <CardDescription>{labels.description ?? "Your public display name."}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
-          <Input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            maxLength={MAX_NAME_LENGTH}
-            placeholder={t("placeholder")}
-            disabled={isSaving}
-          />
-          <p className="text-caption text-muted-foreground">
-            {t("maxLength", { max: MAX_NAME_LENGTH })}
-          </p>
+          <Input value={name} onChange={(e) => setName(e.target.value)} maxLength={maxNameLength} placeholder={labels.placeholder ?? "Your name"} disabled={isSaving} />
+          <p className="text-caption text-muted-foreground">{labels.maxLength ?? `Maximum ${maxNameLength} characters.`}</p>
         </div>
       </CardContent>
       <CardFooter className="border-t">
-        <Button
-          onClick={handleSave}
-          disabled={!isDirty || !isValid || isSaving}
-          size="sm"
-        >
-          {isSaving ? tCommon("saving") : tCommon("save")}
+        <Button onClick={handleSave} disabled={!isDirty || !isValid || isSaving} size="sm">
+          {isSaving ? (labels.saving ?? "Saving...") : (labels.save ?? "Save")}
         </Button>
       </CardFooter>
     </Card>

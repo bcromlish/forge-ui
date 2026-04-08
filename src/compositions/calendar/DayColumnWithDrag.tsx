@@ -1,29 +1,17 @@
 /**
  * Day column with drag-to-create overlay for week/day calendar views.
- * Renders grid lines, events, availability blocks, and the drag preview.
- *
- * @see hooks/useCalendarDrag.ts for drag state machine
- * @see lib/domain/calendar-drag.ts for pixel-to-time math
+ * The drag hook must be provided by the consumer application.
  */
 "use client";
 
 import { cn } from "../../lib/utils";
-// TODO: Replace with prop-based API
-// import type { CalendarEvent } from "@/types/calendarEvents";
-// import {
-//   computeEventPosition,
-//   detectOverlappingEvents,
-// TODO: Replace with prop-based API
-// } from "@/lib/domain/calendar-grid";
-// TODO: Replace with prop-based API
-// import { isToday } from "@/lib/domain/calendar-format";
-// TODO: Replace with prop-based API
-// import { formatDragTimeRange } from "@/lib/domain/calendar-drag";
-// import {
-//   useCalendarDrag,
-//   type DragSelection,
-// TODO: Replace with prop-based API
-// } from "@/hooks/useCalendarDrag";
+import type { CalendarEvent, DragSelection, TimeSlot } from "../../types/calendar";
+import {
+  computeEventPosition,
+  detectOverlappingEvents,
+  isToday,
+  formatDragTimeRange,
+} from "../../types/calendar-utils";
 import { CalendarEventBlock } from "./CalendarEventBlock";
 
 /** Props for {@link DayColumnWithDrag}. */
@@ -33,20 +21,21 @@ interface DayColumnWithDragProps {
   dayEvents: CalendarEvent[];
   startHour: number;
   pixelsPerHour: number;
-  timeSlots: { hour: number; minute: number }[];
+  timeSlots: TimeSlot[];
   onEventClick?: (event: CalendarEvent) => void;
   onDragComplete?: (selection: DragSelection) => void;
-  /** Renders the current time indicator when true. */
-  showCurrentTime?: boolean;
-  /** Component to render for the current time indicator. */
   currentTimeIndicator?: React.ReactNode;
-  /** User lookup for avatar rendering in event blocks. */
   userMap?: Map<string, { _id: string; name: string; avatarUrl?: string }>;
+  /** Optional drag state -- provided by a consumer drag hook. */
+  dragState?: {
+    isDragging: boolean;
+    preview: { top: number; height: number; startTime: number; endTime: number } | null;
+    handleMouseDown: (e: React.MouseEvent) => void;
+  };
 }
 
 /**
- * A single day column with drag-to-create interaction.
- * The overlay div captures mouse events; grid lines are non-interactive.
+ * A single day column with optional drag-to-create interaction.
  */
 export function DayColumnWithDrag({
   day,
@@ -56,22 +45,13 @@ export function DayColumnWithDrag({
   pixelsPerHour,
   timeSlots,
   onEventClick,
-  onDragComplete,
   currentTimeIndicator,
   userMap,
+  dragState,
 }: DayColumnWithDragProps) {
-  const { isDragging, preview, handleMouseDown } = useCalendarDrag({
-    dayStartMs,
-    startHour,
-    pixelsPerHour,
-    dayDate: day,
-    onDragComplete,
-  });
-
   const interviews = dayEvents.filter((e) => e.type === "interview");
   const meetings = dayEvents.filter((e) => e.type === "meeting");
   const availability = dayEvents.filter((e) => e.type === "availability");
-  // Overlap detection applies to interviews and meetings together
   const foregroundEvents = [...interviews, ...meetings];
   const positioned = detectOverlappingEvents(foregroundEvents);
 
@@ -82,99 +62,64 @@ export function DayColumnWithDrag({
         isToday(day) && "bg-blue-50/50 dark:bg-blue-950/20"
       )}
     >
-      {/* Grid lines — non-interactive, purely visual */}
+      {/* Grid lines */}
       {timeSlots.map((slot, slotIdx) => {
-        const top =
-          (slot.hour - startHour + slot.minute / 60) * pixelsPerHour;
+        const top = (slot.hour - startHour + slot.minute / 60) * pixelsPerHour;
         const isHourLine = slot.minute === 0;
         return (
           <div
             key={slotIdx}
             className={cn(
               "absolute left-0 right-0",
-              isHourLine
-                ? "border-t border-border"
-                : "border-t border-border/30"
+              isHourLine ? "border-t border-border" : "border-t border-border/30"
             )}
             style={{ top }}
           />
         );
       })}
 
-      {/* Drag overlay — captures mouse events */}
+      {/* Drag overlay */}
       <div
         className="absolute inset-0 z-0 cursor-crosshair"
-        onMouseDown={handleMouseDown}
+        onMouseDown={dragState?.handleMouseDown}
       />
 
-      {/* Availability blocks (background layer) */}
+      {/* Availability blocks (background) */}
       {availability.map((event) => {
-        const pos = computeEventPosition(
-          event.startTime,
-          event.endTime,
-          dayStartMs,
-          startHour,
-          pixelsPerHour
-        );
+        const pos = computeEventPosition(event.startTime, event.endTime, dayStartMs, startHour, pixelsPerHour);
         return (
-          <div
-            key={event.id}
-            className="absolute left-0 right-0 z-[1] px-0.5"
-            style={{ top: pos.top, height: pos.height }}
-          >
-            <CalendarEventBlock
-              event={event}
-              height={pos.height}
-              onClick={onEventClick}
-              userMap={userMap}
-            />
+          <div key={event.id} className="absolute left-0 right-0 z-[1] px-0.5" style={{ top: pos.top, height: pos.height }}>
+            <CalendarEventBlock event={event} height={pos.height} onClick={onEventClick} userMap={userMap} />
           </div>
         );
       })}
 
-      {/* Interview + meeting events (foreground layer) */}
+      {/* Interview + meeting events (foreground) */}
       {positioned.map(({ event, position }) => {
-        const pos = computeEventPosition(
-          event.startTime,
-          event.endTime,
-          dayStartMs,
-          startHour,
-          pixelsPerHour
-        );
+        const pos = computeEventPosition(event.startTime, event.endTime, dayStartMs, startHour, pixelsPerHour);
         return (
           <div
             key={event.id}
             className="absolute z-[2] px-0.5"
-            style={{
-              top: pos.top,
-              height: pos.height,
-              left: `${position.left}%`,
-              width: `${position.width}%`,
-            }}
+            style={{ top: pos.top, height: pos.height, left: `${position.left}%`, width: `${position.width}%` }}
           >
-            <CalendarEventBlock
-              event={event}
-              height={pos.height}
-              onClick={onEventClick}
-              userMap={userMap}
-            />
+            <CalendarEventBlock event={event} height={pos.height} onClick={onEventClick} userMap={userMap} />
           </div>
         );
       })}
 
       {/* Drag preview */}
-      {isDragging && preview && (
+      {dragState?.isDragging && dragState.preview && (
         <div
           className="absolute left-1 right-1 z-[4] rounded-sm border border-primary/40 bg-primary/20 pointer-events-none flex items-start px-1.5 py-0.5"
-          style={{ top: preview.top, height: preview.height }}
+          style={{ top: dragState.preview.top, height: dragState.preview.height }}
         >
           <span className="text-signal-2 font-medium text-primary">
-            {formatDragTimeRange(preview.startTime, preview.endTime)}
+            {formatDragTimeRange(dragState.preview.startTime, dragState.preview.endTime)}
           </span>
         </div>
       )}
 
-      {/* Current time indicator */}
       {currentTimeIndicator}
     </div>
   );

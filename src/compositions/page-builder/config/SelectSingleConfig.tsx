@@ -1,4 +1,5 @@
-// TODO: Replace with prop-based API
-// /** @deprecated Use @/features/forms/components/config/SelectSingleConfig instead. */
-// TODO: Replace with prop-based API
-// export { SelectSingleConfig } from "@/features/forms/components/config/SelectSingleConfig";
+/**
+ * Placeholder — the original VidCruiter re-export has been removed.
+ * Consumers should provide their own implementation.
+ */
+export {};

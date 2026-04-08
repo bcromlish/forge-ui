@@ -1,4 +1,5 @@
-// TODO: Replace with prop-based API
-// /** @deprecated Use @/features/forms/components/blocks/YesNoBlockRenderer instead. */
-// TODO: Replace with prop-based API
-// export { YesNoBlockRenderer } from "@/features/forms/components/blocks/YesNoBlockRenderer";
+/**
+ * Placeholder — the original VidCruiter re-export has been removed.
+ * Consumers should provide their own implementation.
+ */
+export {};

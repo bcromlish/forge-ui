@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Sidebar,
@@ -14,16 +14,11 @@ import { SidebarChat } from "./sidebar-chat";
 import { SidebarTasks } from "./sidebar-tasks";
 import { SidebarCalendar } from "./sidebar-calendar";
 import { SidebarFooterContent } from "./sidebar-footer";
-// TODO: Replace with prop-based API
-// import { useCurrentMembership } from "@/features/organizations/hooks/useCurrentMembership";
-// TODO: Replace with prop-based API
-// import type { WorkspaceId } from "@/features/organizations/types/workspaces";
-// import {
-//   getAccessibleWorkspaces,
-//   workspaceForPath,
-//   getDefaultRoute,
-// TODO: Replace with prop-based API
-// } from "@/features/organizations/domain/workspaces";
+import type { WorkspaceConfig, WorkspaceGroup } from "../types/domain";
+import type { OrgSwitcherProps } from "./OrgSwitcher";
+import type { SidebarFooterUser, SidebarFooterOrg, LocaleConfig } from "./sidebar-footer";
+import type { CalendarEvent, DragSelection } from "../types/calendar";
+import type { User } from "../types/domain";
 
 /** Props for {@link AppSidebar}. */
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
@@ -31,54 +26,94 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   activeTab: string;
   /** Sign-out handler -- forwarded to sidebar footer menu. */
   onSignOut: () => void;
+
+  // --- Workspace data (required when activeTab === "workspaces") ---
+  /** Workspaces the user can access. */
+  accessibleWorkspaces?: WorkspaceConfig[];
+  /** Workspace groups for grouped dropdown. */
+  workspaceGroups?: WorkspaceGroup[];
+  /** Active workspace inferred from pathname. */
+  activeWorkspaceId?: string;
+
+  // --- Org switcher data ---
+  /** Org switcher props forwarded to OrgSwitcher. */
+  orgSwitcher?: OrgSwitcherProps;
+
+  // --- Footer data ---
+  /** Current user for sidebar footer. */
+  footerUser?: SidebarFooterUser | null;
+  /** Current organization for sidebar footer. */
+  footerOrg?: SidebarFooterOrg | null;
+  /** Locale config for language switcher. */
+  localeConfig?: LocaleConfig;
+
+  // --- Chat data (required when activeTab === "chat") ---
+  /** Active (non-archived) chats. */
+  activeChats?: ChatItem[];
+  /** Archived chats. */
+  archivedChats?: ChatItem[];
+  /** Render function for a single chat menu item. */
+  renderChatItem?: (chat: ChatItem, isActive: boolean) => React.ReactNode;
+
+  // --- Calendar data (required when activeTab === "calendar") ---
+  /** Calendar events for the sidebar mini-calendar and today's events. */
+  calendarEvents?: CalendarEvent[];
+  /** Organization members for the team member filter. */
+  calendarMembers?: User[];
+  /** Currently selected member IDs. */
+  calendarSelectedIds?: Set<string>;
+  /** Callbacks for calendar sidebar interactions. */
+  onCalendarMemberAdd?: (userId: string) => void;
+  onCalendarMemberRemove?: (userId: string) => void;
+  onCalendarDateSelect?: (date: Date) => void;
+  onCalendarEventClick?: (event: CalendarEvent) => void;
+}
+
+/** Minimal chat item shape for the sidebar. */
+export interface ChatItem {
+  _id: string;
+  title?: string;
+  isBookmarked?: boolean;
 }
 
 /**
  * Main application sidebar that renders tab-specific content.
- * For the workspaces tab, integrates WorkspaceSelector dropdown
- * and passes the active workspace config to SidebarWorkspaces.
- * Active workspace is inferred from the current pathname -- selecting
- * a workspace navigates to its default route, and pathname inference
- * keeps the selection in sync as the user navigates.
- *
- * Workspace access is membership-based: Account Owners see all 13,
- * non-owners see their granted workspaces, legacy memberships see all.
+ * All data is provided via props -- no internal data fetching.
  */
-export function AppSidebar({ activeTab, onSignOut, ...props }: AppSidebarProps) {
-  const pathname = usePathname();
+export function AppSidebar({
+  activeTab,
+  onSignOut,
+  accessibleWorkspaces = [],
+  workspaceGroups = [],
+  activeWorkspaceId,
+  orgSwitcher,
+  footerUser,
+  footerOrg,
+  localeConfig,
+  activeChats,
+  archivedChats,
+  renderChatItem,
+  calendarEvents,
+  calendarMembers,
+  calendarSelectedIds,
+  onCalendarMemberAdd,
+  onCalendarMemberRemove,
+  onCalendarDateSelect,
+  onCalendarEventClick,
+  ...props
+}: AppSidebarProps) {
   const router = useRouter();
-  const membership = useCurrentMembership();
 
-  // Build accessible workspaces from membership (isOwner + workspaces array).
-  // Handles: loading (undefined) → empty, null → legacy (all), data → filtered.
-  const accessibleWorkspaces = useMemo(
-    () =>
-      getAccessibleWorkspaces({
-        isOwner: membership?.isOwner,
-        workspaces: membership?.workspaces,
-      }),
-    [membership?.isOwner, membership?.workspaces]
-  );
+  const activeWorkspace = accessibleWorkspaces.find(
+    (ws) => ws.id === activeWorkspaceId
+  ) ?? accessibleWorkspaces[0];
 
-  // Active workspace inferred from current pathname.
-  // Persists naturally: navigating within a workspace keeps the same ID.
-  const activeWorkspaceId = useMemo(
-    () => workspaceForPath(pathname, accessibleWorkspaces),
-    [pathname, accessibleWorkspaces]
-  );
-
-  const activeWorkspace = useMemo(
-    () =>
-      accessibleWorkspaces.find((ws) => ws.id === activeWorkspaceId) ??
-      accessibleWorkspaces[0],
-    [accessibleWorkspaces, activeWorkspaceId]
-  );
-
-  /** Navigate to the selected workspace's default route. */
   const handleWorkspaceChange = useCallback(
-    (workspaceId: WorkspaceId) => {
-      const route = getDefaultRoute(accessibleWorkspaces, workspaceId);
-      router.push(route);
+    (workspaceId: string) => {
+      const ws = accessibleWorkspaces.find((w) => w.id === workspaceId);
+      if (ws?.navItems[0]) {
+        router.push(ws.navItems[0].href);
+      }
     },
     [accessibleWorkspaces, router]
   );
@@ -86,22 +121,44 @@ export function AppSidebar({ activeTab, onSignOut, ...props }: AppSidebarProps) 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader className="border-b">
-        <OrgSwitcher />
+        {orgSwitcher ? <OrgSwitcher {...orgSwitcher} /> : null}
       </SidebarHeader>
       {activeTab === "workspaces" && activeWorkspace && (
         <>
           <WorkspaceSelector
-            activeWorkspaceId={activeWorkspaceId}
+            activeWorkspaceId={activeWorkspaceId ?? activeWorkspace.id}
             accessibleWorkspaces={accessibleWorkspaces}
+            workspaceGroups={workspaceGroups}
             onWorkspaceChange={handleWorkspaceChange}
           />
           <SidebarWorkspaces workspace={activeWorkspace} />
         </>
       )}
-      {activeTab === "chat" && <SidebarChat />}
+      {activeTab === "chat" && (
+        <SidebarChat
+          activeChats={activeChats}
+          archivedChats={archivedChats}
+          renderChatItem={renderChatItem}
+        />
+      )}
       {activeTab === "tasks" && <SidebarTasks />}
-      {activeTab === "calendar" && <SidebarCalendar />}
-      <SidebarFooterContent onSignOut={onSignOut} />
+      {activeTab === "calendar" && (
+        <SidebarCalendar
+          events={calendarEvents ?? []}
+          members={calendarMembers ?? []}
+          selectedIds={calendarSelectedIds ?? new Set()}
+          onMemberAdd={onCalendarMemberAdd}
+          onMemberRemove={onCalendarMemberRemove}
+          onDateSelect={onCalendarDateSelect}
+          onEventClick={onCalendarEventClick}
+        />
+      )}
+      <SidebarFooterContent
+        onSignOut={onSignOut}
+        user={footerUser ?? null}
+        organization={footerOrg ?? null}
+        localeConfig={localeConfig}
+      />
       <SidebarRail />
     </Sidebar>
   );

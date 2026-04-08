@@ -3,10 +3,8 @@
 import { createElement } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useTranslations } from "next-intl";
 import { Briefcase } from "lucide-react";
-// TODO: Replace with prop-based API
-// import type { WorkspaceConfig } from "@/features/organizations/types/workspaces";
+import type { WorkspaceConfig } from "../types/domain";
 import { WORKSPACE_ICON_MAP } from "./workspace-icons";
 import {
   SidebarContent,
@@ -22,6 +20,10 @@ import {
 interface SidebarWorkspacesProps {
   /** The active workspace config whose nav items should be rendered. */
   workspace: WorkspaceConfig;
+  /** Optional label resolver. Defaults to returning the label as-is. */
+  resolveLabel?: (key: string) => string;
+  /** Optional item label resolver. Defaults to returning the label as-is. */
+  resolveItemLabel?: (key: string) => string;
 }
 
 /**
@@ -36,21 +38,19 @@ function renderIcon(iconName: string, className: string) {
 /**
  * Workspaces tab sidebar -- renders nav items for the active workspace.
  * Receives workspace config from parent instead of using hardcoded items.
- *
- * @see components/layouts/AppSidebar.tsx for workspace state management
- * @see lib/domain/workspaces.ts for workspace definitions
  */
-export function SidebarWorkspaces({ workspace }: SidebarWorkspacesProps) {
+export function SidebarWorkspaces({
+  workspace,
+  resolveLabel = (k) => k,
+  resolveItemLabel = (k) => k,
+}: SidebarWorkspacesProps) {
   const pathname = usePathname();
-  const tWorkspaces = useTranslations("navigation.workspaces");
-  const tItems = useTranslations("navigation.items");
 
   return (
     <SidebarContent>
       <SidebarGroup>
-        {/* workspace.label is a translation key (e.g. "recruiting") resolved at render */}
         <SidebarGroupLabel>
-          {tWorkspaces(workspace.label as Parameters<typeof tWorkspaces>[0])}
+          {resolveLabel(workspace.label)}
         </SidebarGroupLabel>
         <SidebarGroupContent>
           <SidebarMenu>
@@ -60,8 +60,7 @@ export function SidebarWorkspaces({ workspace }: SidebarWorkspacesProps) {
                   ? pathname === "/"
                   : pathname === item.href ||
                     pathname.startsWith(item.href + "/");
-              // item.label is a translation key (e.g. "positions") resolved at render
-              const resolvedLabel = tItems(item.label as Parameters<typeof tItems>[0]);
+              const resolvedLabel = resolveItemLabel(item.label);
               return (
                 <SidebarMenuItem key={item.href}>
                   <SidebarMenuButton

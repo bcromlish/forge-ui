@@ -5,12 +5,11 @@
 "use client";
 
 import { Clock, ExternalLink, Users, CalendarClock } from "lucide-react";
-// TODO: Replace with prop-based API
-// import type { CalendarEvent } from "@/types/calendarEvents";
+import type { CalendarEvent } from "../../types/calendar";
 import { formatDuration } from "./calendar-event-helpers";
 import { MetaItem, DetailRow } from "./calendar-event-parts";
 
-/** Availability detail content — renders inside CalendarEventDetail body. */
+/** Availability detail content -- renders inside CalendarEventDetail body. */
 export function AvailabilityEventDetail({ event }: { event: CalendarEvent }) {
   const info = event.availability!;
   const durationMin = Math.round((event.endTime - event.startTime) / 60000);

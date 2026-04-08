@@ -1,4 +1,5 @@
-// TODO: Replace with prop-based API
-// /** @deprecated Use @/features/forms/components/blocks/GroupBlockRenderer instead. */
-// TODO: Replace with prop-based API
-// export { GroupBlockRenderer } from "@/features/forms/components/blocks/GroupBlockRenderer";
+/**
+ * Placeholder — the original VidCruiter re-export has been removed.
+ * Consumers should provide their own implementation.
+ */
+export {};

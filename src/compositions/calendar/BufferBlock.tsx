@@ -1,24 +1,17 @@
 /**
- * Buffer block for calendar views — narrow muted bar between segments.
- * Supports dismiss (hide from personal calendar) and restore actions.
- * Does not modify the session record; only creates/removes bufferDeletion rows.
- *
- * @see lib/domain/calendar-events.ts for buffer event generation
- * @see convex/bufferDeletions.ts for backend persistence
+ * Buffer block for calendar views -- narrow muted bar between segments.
  */
 "use client";
 
 import { cn } from "../../lib/utils";
 import { X, RotateCcw } from "lucide-react";
-// TODO: Replace with prop-based API
-// import { formatTime } from "@/lib/domain/calendar-format";
-// TODO: Replace with prop-based API
-// import type { CalendarEvent } from "@/types/calendarEvents";
+import type { CalendarEvent } from "../../types/calendar";
+import { formatTime } from "../../types/calendar-utils";
 
 /** Props for {@link BufferBlock}. */
 interface BufferBlockProps {
   event: CalendarEvent;
-  /** Height in pixels — determines detail level. */
+  /** Height in pixels -- determines detail level. */
   height?: number;
   /** Called when user dismisses the buffer from their calendar. */
   onDismiss?: (segmentId: string) => void;

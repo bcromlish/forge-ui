@@ -1,12 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
 import { Plus, MessageCircle } from "lucide-react";
-// TODO: Replace with prop-based API
-// import { useActiveChats, useArchivedChats } from "@/features/chats/hooks";
-// TODO: Replace with prop-based API
-// import { ChatMenuItem } from "@/features/chats/components/ChatMenuItem";
 import {
   SidebarContent,
   SidebarGroup,
@@ -16,29 +11,68 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "../primitives/sidebar";
+import type { ChatItem } from "./AppSidebar";
 
-/** Chat sidebar panel -- shows Saved, Recent, and Archived chat sections. */
-export function SidebarChat() {
-  const activeChats = useActiveChats();
-  const archivedChats = useArchivedChats();
+/** Props for {@link SidebarChat}. */
+interface SidebarChatProps {
+  /** Active (non-archived) chats. Undefined means loading. */
+  activeChats?: ChatItem[];
+  /** Archived chats. */
+  archivedChats?: ChatItem[];
+  /** Render function for a single chat menu item. */
+  renderChatItem?: (chat: ChatItem, isActive: boolean) => React.ReactNode;
+  /** Labels for i18n. */
+  labels?: {
+    title?: string;
+    newChat?: string;
+    noChats?: string;
+    saved?: string;
+    recent?: string;
+    archived?: string;
+    defaultChatTitle?: string;
+    loading?: string;
+  };
+}
+
+/**
+ * Chat sidebar panel -- shows Saved, Recent, and Archived chat sections.
+ * All data provided via props -- no internal data fetching.
+ */
+export function SidebarChat({
+  activeChats,
+  archivedChats,
+  renderChatItem,
+  labels = {},
+}: SidebarChatProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const t = useTranslations("sidebar.chat");
-  const tCommon = useTranslations("common");
 
   const isLoading = activeChats === undefined;
   const saved = activeChats?.filter((c) => c.isBookmarked) ?? [];
   const recent = activeChats?.filter((c) => !c.isBookmarked) ?? [];
   const archived = archivedChats ?? [];
 
+  const defaultRenderItem = (chat: ChatItem, isActive: boolean) => (
+    <SidebarMenuItem key={chat._id}>
+      <SidebarMenuButton asChild isActive={isActive}>
+        <a href={`/chat/${chat._id}`}>
+          <span className="truncate">
+            {chat.title || labels.defaultChatTitle || "New Chat"}
+          </span>
+        </a>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+  );
+
+  const render = renderChatItem ?? defaultRenderItem;
+
   return (
     <SidebarContent>
-      {/* New chat button lives in the top group header */}
       <SidebarGroup>
-        <SidebarGroupLabel>{t("title")}</SidebarGroupLabel>
+        <SidebarGroupLabel>{labels.title ?? "Chat"}</SidebarGroupLabel>
         <SidebarGroupAction
           onClick={() => router.push("/")}
-          title={t("newChat")}
+          title={labels.newChat ?? "New Chat"}
         >
           <Plus className="h-4 w-4" />
         </SidebarGroupAction>
@@ -50,20 +84,20 @@ export function SidebarChat() {
             <SidebarMenuItem>
               <SidebarMenuButton disabled>
                 <span className="text-muted-foreground text-body">
-                  {tCommon("loading")}
+                  {labels.loading ?? "Loading..."}
                 </span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
-      ) : activeChats.length === 0 && archived.length === 0 ? (
+      ) : (activeChats?.length ?? 0) === 0 && archived.length === 0 ? (
         <SidebarGroup>
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton disabled>
                 <MessageCircle className="h-4 w-4 text-muted-foreground" />
                 <span className="text-muted-foreground text-body">
-                  {t("noChats")}
+                  {labels.noChats ?? "No chats yet"}
                 </span>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -71,59 +105,29 @@ export function SidebarChat() {
         </SidebarGroup>
       ) : (
         <>
-          {/* Saved section -- only shown when bookmarked chats exist */}
           {saved.length > 0 && (
             <SidebarGroup>
-              <SidebarGroupLabel>{t("saved")}</SidebarGroupLabel>
+              <SidebarGroupLabel>{labels.saved ?? "Saved"}</SidebarGroupLabel>
               <SidebarMenu className="gap-0">
-                {saved.map((chat) => (
-                  <ChatMenuItem
-                    key={chat._id}
-                    chatId={chat._id}
-                    title={chat.title || t("defaultChatTitle")}
-                    isActive={pathname === `/chat/${chat._id}`}
-                    isBookmarked
-                    isArchived={false}
-                  />
-                ))}
+                {saved.map((chat) => render(chat, pathname === `/chat/${chat._id}`))}
               </SidebarMenu>
             </SidebarGroup>
           )}
 
-          {/* Recent section */}
           {recent.length > 0 && (
             <SidebarGroup>
-              <SidebarGroupLabel>{t("recent")}</SidebarGroupLabel>
+              <SidebarGroupLabel>{labels.recent ?? "Recent"}</SidebarGroupLabel>
               <SidebarMenu className="gap-0">
-                {recent.map((chat) => (
-                  <ChatMenuItem
-                    key={chat._id}
-                    chatId={chat._id}
-                    title={chat.title || t("defaultChatTitle")}
-                    isActive={pathname === `/chat/${chat._id}`}
-                    isBookmarked={false}
-                    isArchived={false}
-                  />
-                ))}
+                {recent.map((chat) => render(chat, pathname === `/chat/${chat._id}`))}
               </SidebarMenu>
             </SidebarGroup>
           )}
 
-          {/* Archived section -- only shown when archived chats exist */}
           {archived.length > 0 && (
             <SidebarGroup>
-              <SidebarGroupLabel>{t("archived")}</SidebarGroupLabel>
+              <SidebarGroupLabel>{labels.archived ?? "Archived"}</SidebarGroupLabel>
               <SidebarMenu className="gap-0">
-                {archived.map((chat) => (
-                  <ChatMenuItem
-                    key={chat._id}
-                    chatId={chat._id}
-                    title={chat.title || t("defaultChatTitle")}
-                    isActive={pathname === `/chat/${chat._id}`}
-                    isBookmarked={false}
-                    isArchived
-                  />
-                ))}
+                {archived.map((chat) => render(chat, pathname === `/chat/${chat._id}`))}
               </SidebarMenu>
             </SidebarGroup>
           )}

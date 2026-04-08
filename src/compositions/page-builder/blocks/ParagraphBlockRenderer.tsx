@@ -1,4 +1,5 @@
-// TODO: Replace with prop-based API
-// /** @deprecated Use @/features/forms/components/blocks/ParagraphBlockRenderer instead. */
-// TODO: Replace with prop-based API
-// export { ParagraphBlockRenderer } from "@/features/forms/components/blocks/ParagraphBlockRenderer";
+/**
+ * Placeholder — the original VidCruiter re-export has been removed.
+ * Consumers should provide their own implementation.
+ */
+export {};

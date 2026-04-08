@@ -1,10 +1,7 @@
 /**
- * ActiveOrgProvider — manages which organization is currently active in the UI.
- * Reads memberships via Convex, persists selection in localStorage, and provides
- * switchOrg() for instant client-side org switching.
- *
- * @see hooks/useActiveOrganization.ts for the consumer hook
- * @see convex/organizations.ts for listMyOrganizations query
+ * ActiveOrgProvider -- manages which organization is currently active in the UI.
+ * Accepts organizations as a prop instead of fetching from Convex.
+ * Persists selection in localStorage and provides switchOrg() for instant switching.
  */
 "use client";
 
@@ -17,77 +14,80 @@ import {
   useState,
 } from "react";
 import { useRouter } from "next/navigation";
-// TODO: Replace with prop-based API
-// import type { Id } from "@/convex/_generated/dataModel";
-// TODO: Replace with prop-based API
-// import { useMyOrganizations } from "@/features/organizations/hooks/useOrganization";
 
-const STORAGE_KEY = "vidcruiter:activeOrgId";
+const STORAGE_KEY = "forge-ui:activeOrgId";
+
+/** Minimal organization shape with membership context. */
+export interface OrgWithMembership {
+  _id: string;
+  name: string;
+  [key: string]: unknown;
+}
 
 export interface ActiveOrgContextValue {
   /** The active organization's ID. Undefined while loading. */
-  organizationId: Id<"organizations"> | undefined;
+  organizationId: string | undefined;
   /** The full active organization object. Undefined while loading. */
   organization: OrgWithMembership | undefined;
   /** All organizations the user belongs to (active memberships). */
   memberships: OrgWithMembership[];
   /** Switch the active organization. Updates localStorage + context immediately. */
-  switchOrg: (orgId: Id<"organizations">) => void;
-  /** True while memberships are still loading from Convex. */
+  switchOrg: (orgId: string) => void;
+  /** True while memberships are still loading. */
   isLoading: boolean;
 }
-
-/** Organization enriched with the user's membership role. */
-type OrgWithMembership = NonNullable<
-  Exclude<ReturnType<typeof useMyOrganizations>, undefined>[number]
->;
 
 export const ActiveOrgContext = createContext<ActiveOrgContextValue | null>(
   null
 );
 
-export function ActiveOrgProvider({ children }: { children: React.ReactNode }) {
+/** Props for {@link ActiveOrgProvider}. */
+interface ActiveOrgProviderProps {
+  children: React.ReactNode;
+  /** Organizations the user belongs to. Undefined means loading. */
+  organizations: OrgWithMembership[] | undefined;
+  /** Route to redirect to when user has no organizations. */
+  onboardingRoute?: string;
+}
+
+export function ActiveOrgProvider({
+  children,
+  organizations,
+  onboardingRoute = "/onboarding",
+}: ActiveOrgProviderProps) {
   const router = useRouter();
-  const orgs = useMyOrganizations();
-  // Lazy initializer reads localStorage once on mount — avoids effect + cascading render
-  const [selectedOrgId, setSelectedOrgId] = useState<
-    Id<"organizations"> | undefined
-  >(() => {
+  const [selectedOrgId, setSelectedOrgId] = useState<string | undefined>(() => {
     if (typeof window === "undefined") return undefined;
     const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? (saved as Id<"organizations">) : undefined;
+    return saved ?? undefined;
   });
 
   const validOrgs = useMemo(
-    () => (orgs ? (orgs.filter(Boolean) as OrgWithMembership[]) : []),
-    [orgs]
+    () => (organizations ? organizations.filter(Boolean) : []),
+    [organizations]
   );
 
-  // Derive effective org ID: validate selection against loaded memberships.
-  // Computed during render — no setState needed for the fallback case.
   const activeOrgId = useMemo(() => {
-    if (orgs === undefined) return selectedOrgId; // still loading — trust localStorage
+    if (organizations === undefined) return selectedOrgId;
     if (validOrgs.length === 0) return undefined;
     const isValid = selectedOrgId && validOrgs.some((o) => o._id === selectedOrgId);
     return isValid ? selectedOrgId : validOrgs[0]!._id;
-  }, [orgs, selectedOrgId, validOrgs]);
+  }, [organizations, selectedOrgId, validOrgs]);
 
-  // Persist fallback to localStorage (external system sync — no setState)
   const lastPersistedRef = useRef<string | undefined>(selectedOrgId);
   useEffect(() => {
-    if (orgs === undefined) return;
+    if (organizations === undefined) return;
     if (validOrgs.length === 0) {
-      router.replace("/onboarding");
+      router.replace(onboardingRoute);
       return;
     }
-    // Sync localStorage when the derived ID differs from what was last persisted
     if (activeOrgId && activeOrgId !== lastPersistedRef.current) {
       lastPersistedRef.current = activeOrgId;
       localStorage.setItem(STORAGE_KEY, activeOrgId);
     }
-  }, [orgs, validOrgs, activeOrgId, router]);
+  }, [organizations, validOrgs, activeOrgId, router, onboardingRoute]);
 
-  const switchOrg = useCallback((orgId: Id<"organizations">) => {
+  const switchOrg = useCallback((orgId: string) => {
     setSelectedOrgId(orgId);
     lastPersistedRef.current = orgId;
     localStorage.setItem(STORAGE_KEY, orgId);
@@ -104,9 +104,9 @@ export function ActiveOrgProvider({ children }: { children: React.ReactNode }) {
       organization,
       memberships: validOrgs,
       switchOrg,
-      isLoading: orgs === undefined,
+      isLoading: organizations === undefined,
     }),
-    [activeOrgId, organization, validOrgs, switchOrg, orgs]
+    [activeOrgId, organization, validOrgs, switchOrg, organizations]
   );
 
   return (

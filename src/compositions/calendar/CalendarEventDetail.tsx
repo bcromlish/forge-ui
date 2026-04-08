@@ -1,10 +1,6 @@
 /**
  * Slide-over detail panel for a calendar event.
  * Routes to the appropriate detail sub-component based on event type.
- *
- * @see InterviewEventDetail — interview-specific content
- * @see MeetingEventDetail — meeting-specific content
- * @see AvailabilityEventDetail — availability-specific content
  */
 "use client";
 
@@ -22,10 +18,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../../primitives/dropdown-menu";
-// TODO: Replace with prop-based API
-// import type { CalendarEvent } from "@/types/calendarEvents";
-// TODO: Replace with prop-based API
-// import { formatTime } from "@/lib/domain/calendar-format";
+import type { CalendarEvent } from "../../types/calendar";
+import { formatTime } from "../../types/calendar-utils";
 import { formatEventDate } from "./calendar-event-helpers";
 import { EventTypeChip } from "./calendar-event-parts";
 import { InterviewEventDetail } from "./InterviewEventDetail";
@@ -37,25 +31,17 @@ interface CalendarEventDetailProps {
   event: CalendarEvent | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** Resolved user names by ID. */
   userNames?: Map<string, string>;
-  /** Current authenticated user's ID. */
   currentUserId?: string;
-  /** Organization ID for data queries (notes, etc.). */
   organizationId?: string;
   onEdit?: (eventId: string) => void;
   onDelete?: (eventId: string) => void;
   onComplete?: (eventId: string) => void;
   onCancel?: (eventId: string) => void;
   onNoShow?: (eventId: string) => void;
-  /** Called when the user changes their RSVP status. */
   onRsvpChange?: (eventId: string, status: string) => void;
 }
 
-/**
- * Slide-over detail panel for a calendar event.
- * Shows event type chip, details, join button, agenda/notes, and attendees with RSVP.
- */
 export function CalendarEventDetail({
   event,
   open,
@@ -80,12 +66,7 @@ export function CalendarEventDetail({
             <EventTypeChip type={event.type} />
             <div className="flex items-center gap-1">
               {onEdit && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => onEdit(event.id)}
-                >
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEdit(event.id)}>
                   <Pencil className="h-4 w-4" />
                 </Button>
               )}
@@ -97,10 +78,7 @@ export function CalendarEventDetail({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   {onDelete && (
-                    <DropdownMenuItem
-                      variant="destructive"
-                      onClick={() => onDelete(event.id)}
-                    >
+                    <DropdownMenuItem variant="destructive" onClick={() => onDelete(event.id)}>
                       <Trash2 className="h-4 w-4" />
                       Delete
                     </DropdownMenuItem>
@@ -115,7 +93,6 @@ export function CalendarEventDetail({
             {formatTime(event.startTime)}–{formatTime(event.endTime)}
           </p>
         </SheetHeader>
-
         <div className="flex flex-col gap-6 px-6 pt-4">
           {event.type === "interview" && event.interview ? (
             <InterviewEventDetail

@@ -1,7 +1,7 @@
 /**
- * DEPRECATED -- Re-exports from features/forms/components for backward compat.
-// TODO: Replace with prop-based API
-//  * @deprecated Use `@/features/forms/components/FormBuilderHeader` instead.
+ * Placeholder for PageBuilderHeader composition.
+ * The original VidCruiter re-export has been removed.
+ * Consumers should provide their own FormBuilderHeader implementation
+ * or import from their application's form builder feature.
  */
-// TODO: Replace with prop-based API
-// export { FormBuilderHeader as PageBuilderHeader } from "@/features/forms/components/FormBuilderHeader";
+export {};

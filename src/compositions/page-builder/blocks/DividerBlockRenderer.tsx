@@ -1,4 +1,5 @@
-// TODO: Replace with prop-based API
-// /** @deprecated Use @/features/forms/components/blocks/DividerBlockRenderer instead. */
-// TODO: Replace with prop-based API
-// export { DividerBlockRenderer } from "@/features/forms/components/blocks/DividerBlockRenderer";
+/**
+ * Placeholder — the original VidCruiter re-export has been removed.
+ * Consumers should provide their own implementation.
+ */
+export {};

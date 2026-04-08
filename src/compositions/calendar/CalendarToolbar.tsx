@@ -2,13 +2,10 @@
 
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Plus, CalendarClock } from "lucide-react";
-import { useTranslations } from "next-intl";
 import { Button } from "../../primitives/button";
 import { cn } from "../../lib/utils";
-// TODO: Replace with prop-based API
-// import type { CalendarViewMode } from "@/types/calendarEvents";
-// TODO: Replace with prop-based API
-// import { formatPeriodLabel } from "@/lib/domain/calendar-format";
+import type { CalendarViewMode } from "../../types/calendar";
+import { formatPeriodLabel } from "../../types/calendar-utils";
 
 /** Props for {@link CalendarToolbar}. */
 interface CalendarToolbarProps {
@@ -17,6 +14,11 @@ interface CalendarToolbarProps {
   currentDate: Date;
   onNavigate: (direction: "prev" | "today" | "next") => void;
   onScheduleInterview?: () => void;
+  /** Labels for i18n. */
+  labels?: {
+    editAvailability?: string;
+    scheduleInterview?: string;
+  };
 }
 
 const VIEW_OPTIONS: { value: CalendarViewMode; label: string }[] = [
@@ -25,45 +27,25 @@ const VIEW_OPTIONS: { value: CalendarViewMode; label: string }[] = [
   { value: "month", label: "Month" },
 ];
 
-/**
- * Calendar navigation toolbar — view toggle, date navigation, period label, and actions.
- * Pure component; all state managed by parent.
- */
 export function CalendarToolbar({
   view,
   onViewChange,
   currentDate,
   onNavigate,
   onScheduleInterview,
+  labels = {},
 }: CalendarToolbarProps) {
-  const t = useTranslations("calendar");
-
   return (
     <div className="flex items-center justify-between gap-4 pb-4">
-      {/* Left: Navigation */}
       <div className="flex items-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onNavigate("today")}
-        >
+        <Button variant="outline" size="sm" onClick={() => onNavigate("today")}>
           Today
         </Button>
         <div className="flex items-center">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={() => onNavigate("prev")}
-          >
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onNavigate("prev")}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={() => onNavigate("next")}
-          >
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onNavigate("next")}>
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
@@ -71,10 +53,7 @@ export function CalendarToolbar({
           {formatPeriodLabel(currentDate, view)}
         </h2>
       </div>
-
-      {/* Right: View toggle + actions */}
       <div className="flex items-center gap-2">
-        {/* Segmented view toggle */}
         <div className="flex rounded-md border bg-muted/30 p-0.5">
           {VIEW_OPTIONS.map((opt) => (
             <button
@@ -91,18 +70,16 @@ export function CalendarToolbar({
             </button>
           ))}
         </div>
-
         <Button variant="outline" size="sm" asChild>
           <Link href="/availability">
             <CalendarClock className="mr-1 h-4 w-4" />
-            {t("editAvailability")}
+            {labels.editAvailability ?? "Edit Availability"}
           </Link>
         </Button>
-
         {onScheduleInterview && (
           <Button size="sm" onClick={onScheduleInterview}>
             <Plus className="mr-1 h-4 w-4" />
-            Schedule Interview
+            {labels.scheduleInterview ?? "Schedule Interview"}
           </Button>
         )}
       </div>

@@ -1,4 +1,5 @@
-// TODO: Replace with prop-based API
-// /** @deprecated Use @/features/forms/components/config/GroupConfig instead. */
-// TODO: Replace with prop-based API
-// export { GroupConfig } from "@/features/forms/components/config/GroupConfig";
+/**
+ * Placeholder — the original VidCruiter re-export has been removed.
+ * Consumers should provide their own implementation.
+ */
+export {};

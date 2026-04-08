@@ -1,7 +1,7 @@
 /**
- * DEPRECATED -- Re-exports from features/forms/components for backward compat.
-// TODO: Replace with prop-based API
-//  * @deprecated Use `@/features/forms/components/FormBuilderCanvas` instead.
+ * Placeholder for PageBuilderCanvas composition.
+ * The original VidCruiter re-export has been removed.
+ * Consumers should provide their own FormBuilderCanvas implementation
+ * or import from their application's form builder feature.
  */
-// TODO: Replace with prop-based API
-// export { FormBuilderCanvas as PageBuilderCanvas } from "@/features/forms/components/FormBuilderCanvas";
+export {};

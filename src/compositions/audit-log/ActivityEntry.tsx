@@ -1,19 +1,14 @@
 /**
  * Single activity entry card for the audit log viewer.
  * Renders timestamp, actor, entity badge, and action description.
- *
- * @see convex/schema.ts for the activity table shape
  */
 "use client";
 
-import { useTranslations } from "next-intl";
-// TODO: Replace with prop-based API
-// import { useFormattedDistance } from "@/hooks/useFormattedDate";
 import { Badge } from "../../primitives/badge";
 import { Card, CardContent } from "../../patterns/card";
 import { User } from "lucide-react";
 
-/** Shape of an activity entry from the Convex query. */
+/** Shape of an activity entry. */
 export interface ActivityEntryData {
   _id: string;
   entityType: string;
@@ -27,12 +22,15 @@ export interface ActivityEntryData {
 /** Props for {@link ActivityEntry}. */
 interface ActivityEntryProps {
   entry: ActivityEntryData;
+  /** Pre-formatted relative time string (e.g., "5 minutes ago"). */
+  relativeTime: string;
+  /** Optional entity type label resolver. Defaults to the raw entityType. */
+  resolveEntityLabel?: (entityType: string) => string;
+  /** Label for system-initiated actions. */
+  systemActionLabel?: string;
 }
 
-/** Map entity types to badge variants for visual distinction. */
-function entityBadgeVariant(
-  entityType: string
-): "default" | "secondary" | "outline" {
+function entityBadgeVariant(entityType: string): "default" | "secondary" | "outline" {
   switch (entityType) {
     case "position":
     case "requisition":
@@ -45,27 +43,17 @@ function entityBadgeVariant(
   }
 }
 
-/** Format an action string for display (e.g., "status_changed" -> "Status Changed"). */
 function formatAction(action: string): string {
-  return action
-    .split("_")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
+  return action.split("_").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
 }
 
-/**
- * A single row in the audit log. Shows relative time, entity type badge,
- * action description, and entity reference.
- */
-export function ActivityEntry({ entry }: ActivityEntryProps) {
-  const t = useTranslations("auditLog");
-  const relativeTime = useFormattedDistance(entry.createdAt, {
-    addSuffix: true,
-  });
-
-  const entityLabel =
-    t(`entities.${entry.entityType}` as Parameters<typeof t>[0]) ||
-    entry.entityType;
+export function ActivityEntry({
+  entry,
+  relativeTime,
+  resolveEntityLabel = (t) => t,
+  systemActionLabel = "System action",
+}: ActivityEntryProps) {
+  const entityLabel = resolveEntityLabel(entry.entityType);
 
   return (
     <Card className="py-3">
@@ -75,21 +63,13 @@ export function ActivityEntry({ entry }: ActivityEntryProps) {
         </div>
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant={entityBadgeVariant(entry.entityType)}>
-              {entityLabel}
-            </Badge>
-            <span className="text-body font-medium">
-              {formatAction(entry.action)}
-            </span>
+            <Badge variant={entityBadgeVariant(entry.entityType)}>{entityLabel}</Badge>
+            <span className="text-body font-medium">{formatAction(entry.action)}</span>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-caption text-muted-foreground">
-              {relativeTime}
-            </span>
+            <span className="text-caption text-muted-foreground">{relativeTime}</span>
             {!entry.performedBy && (
-              <span className="text-caption text-muted-foreground">
-                {t("systemAction")}
-              </span>
+              <span className="text-caption text-muted-foreground">{systemActionLabel}</span>
             )}
           </div>
         </div>

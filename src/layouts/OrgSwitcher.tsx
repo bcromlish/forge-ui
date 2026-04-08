@@ -1,16 +1,10 @@
 /**
- * Organization switcher — shows active org name + dropdown for switching.
+ * Organization switcher -- shows active org name + dropdown for switching.
  * Single-org users see org name without a dropdown.
- *
- * @see hooks/useActiveOrganization.ts for the org context
  */
 "use client";
 
-import { useTranslations } from "next-intl";
 import { ChevronsUpDown, Check, Plus } from "lucide-react";
-import { useRouter } from "next/navigation";
-// TODO: Replace with prop-based API
-// import { useActiveOrganization } from "@/features/organizations/hooks/useActiveOrganization";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,6 +18,30 @@ import {
   SidebarMenuItem,
 } from "../primitives/sidebar";
 
+/** An organization membership entry. */
+export interface OrgMembership {
+  _id: string;
+  name: string;
+}
+
+/** Props for {@link OrgSwitcher}. */
+export interface OrgSwitcherProps {
+  /** The currently active organization. */
+  organization: OrgMembership | null;
+  /** All organizations the user belongs to. */
+  memberships: OrgMembership[];
+  /** Switch to a different organization. */
+  onSwitchOrg: (orgId: string) => void;
+  /** Whether data is still loading. */
+  isLoading?: boolean;
+  /** Label for the loading state. */
+  loadingLabel?: string;
+  /** Label for the "Create Organization" action. */
+  createOrgLabel?: string;
+  /** Called when user clicks "Create Organization". */
+  onCreateOrg?: () => void;
+}
+
 /** First letter of org name as avatar placeholder. */
 function OrgAvatar({ name }: { name: string }) {
   return (
@@ -34,27 +52,29 @@ function OrgAvatar({ name }: { name: string }) {
 }
 
 /** Org switcher dropdown for the sidebar header. */
-export function OrgSwitcher() {
-  const { organization, memberships, switchOrg, isLoading } =
-    useActiveOrganization();
-  const router = useRouter();
-  const tCommon = useTranslations("common");
-  const tOnboarding = useTranslations("onboarding.createOrg");
-
+export function OrgSwitcher({
+  organization,
+  memberships,
+  onSwitchOrg,
+  isLoading = false,
+  loadingLabel = "Loading...",
+  createOrgLabel = "Create Organization",
+  onCreateOrg,
+}: OrgSwitcherProps) {
   if (isLoading || !organization) {
     return (
       <SidebarMenu>
         <SidebarMenuItem>
           <SidebarMenuButton size="lg" disabled>
             <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-muted" />
-            <span className="text-muted-foreground">{tCommon("loading")}</span>
+            <span className="text-muted-foreground">{loadingLabel}</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>
     );
   }
 
-  // Single org — show name without dropdown
+  // Single org -- show name without dropdown
   if (memberships.length <= 1) {
     return (
       <SidebarMenu>
@@ -68,7 +88,7 @@ export function OrgSwitcher() {
     );
   }
 
-  // Multi-org — full dropdown
+  // Multi-org -- full dropdown
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -89,7 +109,7 @@ export function OrgSwitcher() {
             {memberships.map((org) => (
               <DropdownMenuItem
                 key={org._id}
-                onClick={() => switchOrg(org._id)}
+                onClick={() => onSwitchOrg(org._id)}
               >
                 <OrgAvatar name={org.name} />
                 <span className="flex-1 truncate">{org.name}</span>
@@ -98,11 +118,15 @@ export function OrgSwitcher() {
                 )}
               </DropdownMenuItem>
             ))}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => router.push("/onboarding")}>
-              <Plus className="size-4" />
-              <span>{tOnboarding("title")}</span>
-            </DropdownMenuItem>
+            {onCreateOrg && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={onCreateOrg}>
+                  <Plus className="size-4" />
+                  <span>{createOrgLabel}</span>
+                </DropdownMenuItem>
+              </>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

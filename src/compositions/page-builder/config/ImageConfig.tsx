@@ -1,4 +1,5 @@
-// TODO: Replace with prop-based API
-// /** @deprecated Use @/features/forms/components/config/ImageConfig instead. */
-// TODO: Replace with prop-based API
-// export { ImageConfig } from "@/features/forms/components/config/ImageConfig";
+/**
+ * Placeholder — the original VidCruiter re-export has been removed.
+ * Consumers should provide their own implementation.
+ */
+export {};

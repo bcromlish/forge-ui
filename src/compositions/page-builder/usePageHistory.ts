@@ -1,7 +1,7 @@
 /**
- * DEPRECATED -- Re-exports from features/forms/components for backward compat.
-// TODO: Replace with prop-based API
-//  * @deprecated Use `@/features/forms/components/usePageHistory` instead.
+ * Placeholder for usePageHistory hook.
+ * The original VidCruiter re-export has been removed.
+ * Consumers should provide their own usePageHistory implementation
+ * or import from their application's form builder feature.
  */
-// TODO: Replace with prop-based API
-// export { usePageHistory } from "@/features/forms/components/usePageHistory";
+export {};

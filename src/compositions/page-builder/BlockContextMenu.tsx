@@ -1,7 +1,7 @@
 /**
- * DEPRECATED -- Re-exports from features/forms/components for backward compat.
-// TODO: Replace with prop-based API
-//  * @deprecated Use `@/features/forms/components/BlockContextMenu` instead.
+ * Placeholder for BlockContextMenu composition.
+ * The original VidCruiter re-export has been removed.
+ * Consumers should provide their own BlockContextMenu implementation
+ * or import from their application's form builder feature.
  */
-// TODO: Replace with prop-based API
-// export { BlockContextMenu } from "@/features/forms/components/BlockContextMenu";
+export {};

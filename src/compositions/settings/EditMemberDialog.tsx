@@ -1,29 +1,16 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { useTranslations } from "next-intl";
 import { Settings } from "lucide-react";
-import { toast } from "sonner";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
 } from "../../primitives/dialog";
 import { Button } from "../../primitives/button";
 import { Label } from "../../primitives/label";
 import { Switch } from "../../primitives/switch";
 import { Badge } from "../../primitives/badge";
 import { WorkspaceAccessEditor } from "./WorkspaceAccessEditor";
-// TODO: Replace with prop-based API
-// import { useGrantWorkspaceAccess, useRevokeWorkspaceAccess, useSetOwner } from "@/features/organizations/hooks/useWorkspaces";
-// TODO: Replace with prop-based API
-// import { ALL_WORKSPACE_IDS } from "@/features/organizations/domain/workspaces";
 
-/** Member shape expected by the dialog -- subset of enriched member. */
 interface EditMemberInfo {
   _id: string;
   userName: string;
@@ -32,198 +19,93 @@ interface EditMemberInfo {
   workspaces?: string[];
 }
 
-/** Props for {@link EditMemberDialog}. */
 interface EditMemberDialogProps {
   member: EditMemberInfo;
   organizationId: string;
-  /** Whether the current user is an owner (required to toggle owner flag). */
   isCurrentUserOwner: boolean;
+  /** All available workspace IDs. */
+  allWorkspaceIds: string[];
+  /** Save handler -- receives updated workspace list and owner flag. */
+  onSave: (data: { membershipId: string; isOwner: boolean; workspaces: string[] }) => Promise<void>;
+  /** Labels for i18n. */
+  labels?: {
+    title?: string; description?: string; ownerLabel?: string; ownerDescription?: string;
+    ownerBadge?: string; ownerAccessNote?: string; workspacesLabel?: string;
+    success?: string; error?: string; cancel?: string; save?: string; saving?: string;
+  };
+  /** Workspace data for the workspace editor. */
+  workspaces?: { id: string; label: string; iconName: string }[];
 }
 
-/**
- * Dialog for editing a member's workspace access and owner flag.
- * Shows a multi-select workspace picker and owner toggle.
- * Computes diff on save -- grants new workspaces and revokes removed ones.
- */
 export function EditMemberDialog({
-  member,
-  organizationId,
-  isCurrentUserOwner,
+  member, organizationId, isCurrentUserOwner, allWorkspaceIds, onSave,
+  labels = {}, workspaces = [],
 }: EditMemberDialogProps) {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const [isOwner, setIsOwner] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const grantAccess = useGrantWorkspaceAccess();
-  const revokeAccess = useRevokeWorkspaceAccess();
-  const setOwnerMutation = useSetOwner();
-
-  const t = useTranslations("settings.members.edit");
-  const tCommon = useTranslations("common");
-
-  // Sync local state when dialog opens or member data changes
   useEffect(() => {
     if (open) {
-      setSelected(member.workspaces ?? [...ALL_WORKSPACE_IDS]);
+      setSelected(member.workspaces ?? [...allWorkspaceIds]);
       setIsOwner(member.isOwner ?? false);
     }
-  }, [open, member.workspaces, member.isOwner]);
+  }, [open, member.workspaces, member.isOwner, allWorkspaceIds]);
 
-  const handleOpenChange = useCallback(
-    (nextOpen: boolean) => {
-      setOpen(nextOpen);
-      if (!nextOpen) {
-        setIsSubmitting(false);
-      }
-    },
-    []
-  );
+  const handleOpenChange = useCallback((nextOpen: boolean) => { setOpen(nextOpen); if (!nextOpen) setIsSubmitting(false); }, []);
 
   const handleSave = useCallback(async () => {
     setIsSubmitting(true);
     try {
-      const currentIsOwner = member.isOwner ?? false;
-      const ownerChanged = isOwner !== currentIsOwner;
-
-      // Handle owner flag change first (it clears workspace array when promoting)
-      if (ownerChanged) {
-        /* eslint-disable @typescript-eslint/no-explicit-any -- generic string to Id<> bridge */
-        await setOwnerMutation({
-          organizationId: organizationId as any,
-          membershipId: member._id as any,
-          isOwner,
-        });
-        /* eslint-enable @typescript-eslint/no-explicit-any */
-      }
-
-      // Only update workspaces if NOT owner (owners bypass workspace restrictions)
-      if (!isOwner && !ownerChanged) {
-        const currentWorkspaces = new Set(member.workspaces ?? []);
-        const newWorkspaces = new Set(selected);
-
-        const toGrant = selected.filter((id) => !currentWorkspaces.has(id));
-        const toRevoke = (member.workspaces ?? []).filter(
-          (id) => !newWorkspaces.has(id)
-        );
-
-        if (toGrant.length > 0) {
-          /* eslint-disable @typescript-eslint/no-explicit-any -- generic string to Id<> bridge */
-          await grantAccess({
-            organizationId: organizationId as any,
-            membershipId: member._id as any,
-            workspaceIds: toGrant,
-          });
-          /* eslint-enable @typescript-eslint/no-explicit-any */
-        }
-
-        if (toRevoke.length > 0) {
-          /* eslint-disable @typescript-eslint/no-explicit-any -- generic string to Id<> bridge */
-          await revokeAccess({
-            organizationId: organizationId as any,
-            membershipId: member._id as any,
-            workspaceIds: toRevoke,
-          });
-          /* eslint-enable @typescript-eslint/no-explicit-any */
-        }
-      }
-
-      toast.success(t("success", { name: member.userName }));
+      await onSave({ membershipId: member._id, isOwner, workspaces: isOwner ? [...allWorkspaceIds] : selected });
       setOpen(false);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : t("error");
-      toast.error(message);
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [
-    member,
-    isOwner,
-    selected,
-    organizationId,
-    grantAccess,
-    revokeAccess,
-    setOwnerMutation,
-    t,
-  ]);
+    } catch {
+      // Error handling delegated to consumer via onSave rejection
+    } finally { setIsSubmitting(false); }
+  }, [member._id, isOwner, selected, allWorkspaceIds, onSave]);
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 text-muted-foreground hover:text-foreground"
-        >
-          <Settings className="h-4 w-4" />
-        </Button>
+        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground"><Settings className="h-4 w-4" /></Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{t("title")}</DialogTitle>
-          <DialogDescription>
-            {t("description", { name: member.userName })}
-          </DialogDescription>
+          <DialogTitle>{labels.title ?? "Edit Member"}</DialogTitle>
+          <DialogDescription>{labels.description ?? `Update access for ${member.userName}.`}</DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          {/* Owner toggle -- only visible to other owners */}
           {isCurrentUserOwner && (
             <div className="flex items-center justify-between rounded-md border p-3">
               <div className="grid gap-0.5">
-                <Label className="text-body font-medium">
-                  {t("ownerLabel")}
-                </Label>
-                <span className="text-caption text-muted-foreground">
-                  {t("ownerDescription")}
-                </span>
+                <Label className="text-body font-medium">{labels.ownerLabel ?? "Account Owner"}</Label>
+                <span className="text-caption text-muted-foreground">{labels.ownerDescription ?? "Owners have full access to all workspaces."}</span>
               </div>
-              <Switch
-                checked={isOwner}
-                onCheckedChange={setIsOwner}
-                disabled={isSubmitting}
-              />
+              <Switch checked={isOwner} onCheckedChange={setIsOwner} disabled={isSubmitting} />
             </div>
           )}
-
-          {/* Owner badge info */}
           {isOwner && (
             <div className="flex items-center gap-2 rounded-md bg-amber-50 p-3 dark:bg-amber-900/20">
-              <Badge
-                variant="secondary"
-                className="border-0 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300"
-              >
-                {t("ownerBadge")}
+              <Badge variant="secondary" className="border-0 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+                {labels.ownerBadge ?? "Owner"}
               </Badge>
-              <span className="text-caption text-muted-foreground">
-                {t("ownerAccessNote")}
-              </span>
+              <span className="text-caption text-muted-foreground">{labels.ownerAccessNote ?? "Owners automatically have access to all workspaces."}</span>
             </div>
           )}
-
-          {/* Workspace picker */}
           <div className="grid gap-2">
-            <Label className="text-body font-medium">
-              {t("workspacesLabel")}
-            </Label>
+            <Label className="text-body font-medium">{labels.workspacesLabel ?? "Workspaces"}</Label>
             <WorkspaceAccessEditor
-              selected={isOwner ? [...ALL_WORKSPACE_IDS] : selected}
+              selected={isOwner ? [...allWorkspaceIds] : selected}
               onChange={setSelected}
               disabled={isOwner || isSubmitting}
+              workspaces={workspaces}
             />
           </div>
         </div>
         <DialogFooter>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => handleOpenChange(false)}
-            disabled={isSubmitting}
-          >
-            {tCommon("cancel")}
-          </Button>
-          <Button onClick={handleSave} disabled={isSubmitting}>
-            {isSubmitting ? tCommon("saving") : tCommon("save")}
-          </Button>
+          <Button type="button" variant="outline" onClick={() => handleOpenChange(false)} disabled={isSubmitting}>{labels.cancel ?? "Cancel"}</Button>
+          <Button onClick={handleSave} disabled={isSubmitting}>{isSubmitting ? (labels.saving ?? "Saving...") : (labels.save ?? "Save")}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

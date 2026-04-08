@@ -1,214 +1,104 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useTranslations } from "next-intl";
 import { UserPlus } from "lucide-react";
-import { toast } from "sonner";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
 } from "../../primitives/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../primitives/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../primitives/select";
 import { Button } from "../../primitives/button";
 import { Input } from "../../primitives/input";
 import { Label } from "../../primitives/label";
 import { WorkspaceAccessEditor } from "./WorkspaceAccessEditor";
-// TODO: Replace with prop-based API
-// import { useInviteMember } from "@/features/organizations/hooks/useMemberships";
-// TODO: Replace with prop-based API
-// import { useGrantWorkspaceAccess } from "@/features/organizations/hooks/useWorkspaces";
-// TODO: Replace with prop-based API
-// import { ALL_WORKSPACE_IDS } from "@/features/organizations/domain/workspaces";
-// TODO: Replace with prop-based API
-// import type { MembershipRole } from "@/features/organizations/types/memberships";
+import type { MembershipRole } from "../../types/domain";
 
-/** Props for {@link InviteMemberDialog}. */
+const ROLE_OPTIONS: { value: MembershipRole; label: string }[] = [
+  { value: "admin", label: "Admin" },
+  { value: "hiring_manager", label: "Hiring Manager" },
+  { value: "interviewer", label: "Interviewer" },
+  { value: "viewer", label: "Viewer" },
+];
+
+function isValidEmail(email: string): boolean { return email.includes("@") && email.length > 2; }
+
 interface InviteMemberDialogProps {
   organizationId: string;
+  /** All available workspace IDs. */
+  allWorkspaceIds: string[];
+  /** Invite handler. */
+  onInvite: (data: { email: string; role: MembershipRole; workspaces: string[] }) => Promise<void>;
+  /** Optional role labels for i18n override. */
+  roleLabels?: Record<string, string>;
+  /** Workspace data for the editor. */
+  workspaces?: { id: string; label: string; iconName: string }[];
+  /** Labels for i18n. */
+  labels?: {
+    button?: string; title?: string; description?: string; emailLabel?: string;
+    emailPlaceholder?: string; roleLabel?: string; rolePlaceholder?: string;
+    workspacesLabel?: string; cancel?: string; send?: string; sending?: string;
+    emailRequired?: string; emailInvalid?: string;
+  };
 }
 
-/** Role key mapping for translation lookup. */
-const ROLE_KEYS = [
-  { value: "admin", key: "admin" },
-  { value: "hiring_manager", key: "hiringManager" },
-  { value: "interviewer", key: "interviewer" },
-  { value: "viewer", key: "viewer" },
-] as const;
-
-/** Basic email format check -- presence of @ symbol. */
-function isValidEmail(email: string): boolean {
-  return email.includes("@") && email.length > 2;
-}
-
-/**
- * Dialog for inviting a new member to the organization.
- * Contains email input, role selector, workspace selection, and submit/cancel buttons.
- * Admin-only -- parent component controls visibility.
- */
-export function InviteMemberDialog({ organizationId }: InviteMemberDialogProps) {
+export function InviteMemberDialog({
+  allWorkspaceIds, onInvite, roleLabels, workspaces = [], labels = {},
+}: InviteMemberDialogProps) {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<MembershipRole>("viewer");
-  const [workspaces, setWorkspaces] = useState<string[]>([...ALL_WORKSPACE_IDS]);
+  const [selectedWorkspaces, setSelectedWorkspaces] = useState<string[]>([...allWorkspaceIds]);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const inviteMember = useInviteMember();
-  const grantAccess = useGrantWorkspaceAccess();
-  const t = useTranslations("settings.members.invite");
-  const tRoles = useTranslations("roles");
-  const tErrors = useTranslations("errors");
-  const tCommon = useTranslations("common");
+  const resetForm = useCallback(() => { setEmail(""); setRole("viewer"); setSelectedWorkspaces([...allWorkspaceIds]); setError(null); setIsSubmitting(false); }, [allWorkspaceIds]);
+  const handleOpenChange = useCallback((nextOpen: boolean) => { setOpen(nextOpen); if (!nextOpen) resetForm(); }, [resetForm]);
 
-  const resetForm = useCallback(() => {
-    setEmail("");
-    setRole("viewer");
-    setWorkspaces([...ALL_WORKSPACE_IDS]);
-    setError(null);
-    setIsSubmitting(false);
-  }, []);
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault(); setError(null);
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) { setError(labels.emailRequired ?? "Email is required."); return; }
+    if (!isValidEmail(trimmedEmail)) { setError(labels.emailInvalid ?? "Invalid email address."); return; }
+    setIsSubmitting(true);
+    try {
+      await onInvite({ email: trimmedEmail, role, workspaces: selectedWorkspaces });
+      setOpen(false); resetForm();
+    } catch (err) { setError(err instanceof Error ? err.message : "Failed to invite member."); } finally { setIsSubmitting(false); }
+  }, [email, role, selectedWorkspaces, onInvite, resetForm, labels]);
 
-  const handleOpenChange = useCallback(
-    (nextOpen: boolean) => {
-      setOpen(nextOpen);
-      if (!nextOpen) resetForm();
-    },
-    [resetForm]
-  );
-
-  const handleSubmit = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
-      setError(null);
-
-      const trimmedEmail = email.trim();
-      if (!trimmedEmail) {
-        setError(tErrors("emailRequired"));
-        return;
-      }
-      if (!isValidEmail(trimmedEmail)) {
-        setError(tErrors("emailInvalid"));
-        return;
-      }
-
-      setIsSubmitting(true);
-      try {
-        /* eslint-disable @typescript-eslint/no-explicit-any -- generic string to Id<> bridge */
-        const membershipId = await inviteMember({
-          organizationId: organizationId as any,
-          email: trimmedEmail,
-          role,
-        });
-
-        // Grant workspace access if not giving all workspaces
-        if (workspaces.length > 0 && workspaces.length < ALL_WORKSPACE_IDS.length) {
-          await grantAccess({
-            organizationId: organizationId as any,
-            membershipId: membershipId as any,
-            workspaceIds: workspaces,
-          });
-        }
-        /* eslint-enable @typescript-eslint/no-explicit-any */
-
-        toast.success(t("success", { email: trimmedEmail }));
-        setOpen(false);
-        resetForm();
-      } catch (err) {
-        const message = err instanceof Error ? err.message : t("error");
-        setError(message);
-      } finally {
-        setIsSubmitting(false);
-      }
-    },
-    [email, role, workspaces, organizationId, inviteMember, grantAccess, resetForm, t, tErrors]
-  );
+  const resolvedRoleLabels = roleLabels ?? Object.fromEntries(ROLE_OPTIONS.map((r) => [r.value, r.label]));
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        <Button size="sm">
-          <UserPlus className="mr-2 h-4 w-4" />
-          {t("button")}
-        </Button>
-      </DialogTrigger>
+      <DialogTrigger asChild><Button size="sm"><UserPlus className="mr-2 h-4 w-4" />{labels.button ?? "Invite Member"}</Button></DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>{t("title")}</DialogTitle>
-            <DialogDescription>
-              {t("description")}
-            </DialogDescription>
+            <DialogTitle>{labels.title ?? "Invite Member"}</DialogTitle>
+            <DialogDescription>{labels.description ?? "Add a new member to your organization."}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="invite-email">{t("emailLabel")}</Label>
-              <Input
-                id="invite-email"
-                type="email"
-                placeholder={t("emailPlaceholder")}
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  if (error) setError(null);
-                }}
-                disabled={isSubmitting}
-                autoFocus
-              />
+              <Label htmlFor="invite-email">{labels.emailLabel ?? "Email"}</Label>
+              <Input id="invite-email" type="email" placeholder={labels.emailPlaceholder ?? "name@example.com"} value={email} onChange={(e) => { setEmail(e.target.value); if (error) setError(null); }} disabled={isSubmitting} autoFocus />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="invite-role">{t("roleLabel")}</Label>
-              <Select
-                value={role}
-                onValueChange={(v) => setRole(v as MembershipRole)}
-                disabled={isSubmitting}
-              >
-                <SelectTrigger id="invite-role">
-                  <SelectValue placeholder={t("rolePlaceholder")} />
-                </SelectTrigger>
+              <Label htmlFor="invite-role">{labels.roleLabel ?? "Role"}</Label>
+              <Select value={role} onValueChange={(v) => setRole(v as MembershipRole)} disabled={isSubmitting}>
+                <SelectTrigger id="invite-role"><SelectValue placeholder={labels.rolePlaceholder ?? "Select role"} /></SelectTrigger>
                 <SelectContent>
-                  {ROLE_KEYS.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      {tRoles(opt.key)}
-                    </SelectItem>
-                  ))}
+                  {ROLE_OPTIONS.map((opt) => (<SelectItem key={opt.value} value={opt.value}>{resolvedRoleLabels[opt.value] ?? opt.label}</SelectItem>))}
                 </SelectContent>
               </Select>
             </div>
             <div className="grid gap-2">
-              <Label>{t("workspacesLabel")}</Label>
-              <WorkspaceAccessEditor
-                selected={workspaces}
-                onChange={setWorkspaces}
-                disabled={isSubmitting}
-              />
+              <Label>{labels.workspacesLabel ?? "Workspaces"}</Label>
+              <WorkspaceAccessEditor selected={selectedWorkspaces} onChange={setSelectedWorkspaces} disabled={isSubmitting} workspaces={workspaces} />
             </div>
-            {error && (
-              <p className="text-body text-destructive">{error}</p>
-            )}
+            {error && <p className="text-body text-destructive">{error}</p>}
           </div>
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => handleOpenChange(false)}
-              disabled={isSubmitting}
-            >
-              {tCommon("cancel")}
-            </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? tCommon("sending") : t("sendButton")}
-            </Button>
+            <Button type="button" variant="outline" onClick={() => handleOpenChange(false)} disabled={isSubmitting}>{labels.cancel ?? "Cancel"}</Button>
+            <Button type="submit" disabled={isSubmitting}>{isSubmitting ? (labels.sending ?? "Sending...") : (labels.send ?? "Send Invite")}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

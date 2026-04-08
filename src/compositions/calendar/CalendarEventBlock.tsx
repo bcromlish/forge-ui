@@ -2,12 +2,8 @@
 
 import { Video, Phone, MapPin, Monitor, Layers, Calendar } from "lucide-react";
 import { cn } from "../../lib/utils";
-// TODO: Replace with prop-based API
-// import type { CalendarEvent } from "@/types/calendarEvents";
-// TODO: Replace with prop-based API
-// import { getEventColor } from "@/lib/domain/calendar-events";
-// TODO: Replace with prop-based API
-// import { formatTime } from "@/lib/domain/calendar-format";
+import type { CalendarEvent } from "../../types/calendar";
+import { formatTime, getEventColor } from "../../types/calendar-utils";
 import { BufferBlock } from "./BufferBlock";
 
 /** Meeting type icons (compact). */
@@ -29,24 +25,17 @@ export interface CalendarUserInfo {
 /** Props for {@link CalendarEventBlock}. */
 interface CalendarEventBlockProps {
   event: CalendarEvent;
-  /** Height in pixels — determines detail level. */
   height?: number;
   onClick?: (event: CalendarEvent) => void;
-  /** Called when user dismisses a buffer from their calendar. */
   onBufferDismiss?: (segmentId: string) => void;
-  /** Called when user restores a previously dismissed buffer. */
   onBufferRestore?: (segmentId: string) => void;
-  /** Set of segment IDs whose buffers are dismissed for the current user. */
   dismissedBufferSegmentIds?: Set<string>;
-  /** User lookup for avatar rendering. */
   userMap?: Map<string, CalendarUserInfo>;
   className?: string;
 }
 
 /**
  * Individual event block for the calendar time grid.
- * Visually distinct per type: availability = olive hatched zone,
- * meeting = mauve bar, interview = indigo bar.
  */
 export function CalendarEventBlock({
   event,
@@ -58,7 +47,6 @@ export function CalendarEventBlock({
   userMap,
   className,
 }: CalendarEventBlockProps) {
-  // Buffer events get a specialized narrow block
   if (event.segment?.isBuffer) {
     return (
       <BufferBlock
@@ -102,7 +90,6 @@ export function CalendarEventBlock({
   );
 }
 
-/** Availability — olive hatched background zone. */
 function AvailabilityBlock({
   event, height, onClick, colors, userMap, className,
 }: {
@@ -141,7 +128,6 @@ function AvailabilityBlock({
   );
 }
 
-/** Meeting — mauve left accent bar. */
 function MeetingBlock({
   event, isCompact, isMedium, onClick, colors, userMap, className,
 }: {
@@ -180,7 +166,6 @@ function MeetingBlock({
   );
 }
 
-/** Interview — indigo left accent bar with candidate name. */
 function InterviewBlock({
   event, isCompact, isMedium, onClick, colors, userMap, className,
 }: {
@@ -223,13 +208,8 @@ function InterviewBlock({
   );
 }
 
-// ---------------------------------------------------------------------------
-// Avatar Stack
-// ---------------------------------------------------------------------------
-
 const MAX_VISIBLE_AVATARS = 2;
 
-/** Renders a compact avatar stack in the top-right of an event card. */
 function EventAvatarStack({
   userIds,
   userMap,
@@ -238,13 +218,8 @@ function EventAvatarStack({
   userMap?: Map<string, CalendarUserInfo>;
 }) {
   if (!userMap || userIds.length === 0) return null;
-
-  const users = userIds
-    .map((id) => userMap.get(id))
-    .filter((u): u is CalendarUserInfo => u !== undefined);
-
+  const users = userIds.map((id) => userMap.get(id)).filter((u): u is CalendarUserInfo => u !== undefined);
   if (users.length === 0) return null;
-
   const visible = users.slice(0, MAX_VISIBLE_AVATARS);
   const overflow = users.length - MAX_VISIBLE_AVATARS;
 
@@ -262,31 +237,16 @@ function EventAvatarStack({
   );
 }
 
-/** 16px avatar with initials fallback. */
 function MiniAvatar({ name, avatarUrl }: { name: string; avatarUrl?: string }) {
-  const initials = name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-
+  const initials = name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
   if (avatarUrl) {
     return (
-      /* eslint-disable-next-line @next/next/no-img-element -- external avatar URL, domain unknown at build time */
-      <img
-        src={avatarUrl}
-        alt={name}
-        className="h-4 w-4 rounded-full object-cover ring-1 ring-white dark:ring-gray-900"
-      />
+      /* eslint-disable-next-line @next/next/no-img-element */
+      <img src={avatarUrl} alt={name} className="h-4 w-4 rounded-full object-cover ring-1 ring-white dark:ring-gray-900" />
     );
   }
-
   return (
-    <span
-      className="flex h-4 w-4 items-center justify-center rounded-full bg-muted text-signal-2 font-medium ring-1 ring-white dark:ring-gray-900"
-      title={name}
-    >
+    <span className="flex h-4 w-4 items-center justify-center rounded-full bg-muted text-signal-2 font-medium ring-1 ring-white dark:ring-gray-900" title={name}>
       {initials}
     </span>
   );

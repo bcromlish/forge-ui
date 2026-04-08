@@ -17,10 +17,7 @@ import {
 } from "../primitives/sidebar";
 import { SidebarBack } from "./SidebarBack";
 import { SidebarFooterContent } from "./sidebar-footer";
-// TODO: Replace with prop-based API
-// import { usePermissions } from "@/features/permissions/hooks/usePermissions";
-// TODO: Replace with prop-based API
-// import { hasPermission } from "@/features/permissions/domain/permissions";
+import type { SidebarFooterUser, SidebarFooterOrg, LocaleConfig } from "./sidebar-footer";
 
 /** Settings navigation items with route, icon, and optional required permission. */
 const SETTINGS_NAV_ITEMS = [
@@ -35,29 +32,45 @@ const SETTINGS_NAV_ITEMS = [
 interface SettingsSidebarProps {
   /** Sign-out handler forwarded to the shared footer. */
   onSignOut: () => void;
+  /** User's granted permissions. Items with a permission not in this set are hidden. */
+  permissions?: Set<string>;
+  /** Whether permissions are still loading. */
+  permissionsLoading?: boolean;
+  /** Footer user data. */
+  footerUser?: SidebarFooterUser | null;
+  /** Footer organization data. */
+  footerOrg?: SidebarFooterOrg | null;
+  /** Locale config for language switcher. */
+  localeConfig?: LocaleConfig;
 }
 
 /**
  * Settings-specific sidebar replacing AppSidebar on /settings/* routes.
  * Renders a back button, settings nav items, and the shared user footer.
- * Uses the same Sidebar shell as AppSidebar for visual consistency.
+ * Permission-based filtering is done via the `permissions` prop.
  */
-export function SettingsSidebar({ onSignOut }: SettingsSidebarProps) {
+export function SettingsSidebar({
+  onSignOut,
+  permissions = new Set(),
+  permissionsLoading = false,
+  footerUser,
+  footerOrg,
+  localeConfig,
+}: SettingsSidebarProps) {
   const pathname = usePathname();
-  const { permissions, loading } = usePermissions();
 
   // Filter nav items by permission -- items without a permission field are always visible
   const visibleItems = useMemo(
     () =>
-      loading
+      permissionsLoading
         ? SETTINGS_NAV_ITEMS.filter((item) => !("permission" in item))
         : SETTINGS_NAV_ITEMS.filter(
             (item) =>
               !("permission" in item) ||
               !item.permission ||
-              hasPermission(permissions, item.permission)
+              permissions.has(item.permission)
           ),
-    [permissions, loading]
+    [permissions, permissionsLoading]
   );
 
   return (
@@ -89,7 +102,12 @@ export function SettingsSidebar({ onSignOut }: SettingsSidebarProps) {
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooterContent onSignOut={onSignOut} />
+      <SidebarFooterContent
+        onSignOut={onSignOut}
+        user={footerUser ?? null}
+        organization={footerOrg ?? null}
+        localeConfig={localeConfig}
+      />
       <SidebarRail />
     </Sidebar>
   );

@@ -1,4 +1,5 @@
-// TODO: Replace with prop-based API
-// /** @deprecated Use @/features/forms/components/config/NumberConfig instead. */
-// TODO: Replace with prop-based API
-// export { NumberConfig } from "@/features/forms/components/config/NumberConfig";
+/**
+ * Placeholder — the original VidCruiter re-export has been removed.
+ * Consumers should provide their own implementation.
+ */
+export {};

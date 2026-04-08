@@ -1,18 +1,16 @@
 "use client";
 
 import { cn } from "../../lib/utils";
-// TODO: Replace with prop-based API
-// import type { CalendarEvent } from "@/types/calendarEvents";
-// import {
-//   getMonthGridDays,
-//   computeDayBoundaries,
-//   filterEventsByDay,
-// TODO: Replace with prop-based API
-// } from "@/lib/domain/calendar-grid";
-// TODO: Replace with prop-based API
-// import { isToday, isSameDay, formatTime } from "@/lib/domain/calendar-format";
-// TODO: Replace with prop-based API
-// import { getEventColor } from "@/lib/domain/calendar-events";
+import type { CalendarEvent } from "../../types/calendar";
+import {
+  getMonthGridDays,
+  computeDayBoundaries,
+  filterEventsByDay,
+  isToday,
+  isSameDay,
+  formatTime,
+  getEventColor,
+} from "../../types/calendar-utils";
 
 const WEEKDAY_HEADERS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const MAX_VISIBLE_EVENTS = 3;
@@ -25,10 +23,6 @@ interface CalendarMonthViewProps {
   selectedDate?: Date;
 }
 
-/**
- * Month overview — shows event indicators per day.
- * Click a day to navigate to day view.
- */
 export function CalendarMonthView({
   month,
   events,
@@ -40,19 +34,13 @@ export function CalendarMonthView({
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden rounded-lg border bg-white dark:bg-gray-950">
-      {/* Weekday headers */}
       <div className="grid grid-cols-7 border-b">
         {WEEKDAY_HEADERS.map((day) => (
-          <div
-            key={day}
-            className="py-2 text-center text-caption font-medium text-muted-foreground"
-          >
+          <div key={day} className="py-2 text-center text-caption font-medium text-muted-foreground">
             {day}
           </div>
         ))}
       </div>
-
-      {/* Day grid */}
       <div className="grid grid-cols-7 flex-1">
         {gridDays.map((day, idx) => {
           const { start, end } = computeDayBoundaries(day);
@@ -72,7 +60,6 @@ export function CalendarMonthView({
                 selected && "ring-2 ring-primary ring-inset"
               )}
             >
-              {/* Date number */}
               <div className="flex items-center justify-between mb-1">
                 <span
                   className={cn(
@@ -87,19 +74,13 @@ export function CalendarMonthView({
                   <span className="flex h-1.5 w-1.5 rounded-full bg-blue-500" />
                 )}
               </div>
-
-              {/* Event previews */}
               <div className="flex flex-col gap-0.5">
                 {visibleEvents.slice(0, MAX_VISIBLE_EVENTS).map((event) => {
                   const colors = getEventColor(event.type, event.interview?.status);
                   return (
                     <div
                       key={event.id}
-                      className={cn(
-                        "truncate rounded-sm px-1 py-0.5 text-caption leading-tight",
-                        colors.bg,
-                        colors.text
-                      )}
+                      className={cn("truncate rounded-sm px-1 py-0.5 text-caption leading-tight", colors.bg, colors.text)}
                     >
                       {formatTime(event.startTime)} {event.title}
                     </div>
